@@ -1,0 +1,110 @@
+/* Hero Section */
+.home-hero {
+  width: 100%;
+  background: linear-gradient(135deg, #eef5ff, #ffffff);
+}
+
+/* Main container */
+.home-container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 80px 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+/* Left content */
+.home-content h1 {
+  font-size: 56px;
+  font-weight: 700;
+  color: #0a66c2;
+  line-height: 1.2;
+}
+
+.home-content h1 span {
+  color: #084d99;
+}
+
+.home-content p {
+  margin-top: 20px;
+  font-size: 18px;
+  color: #555;
+  max-width: 520px;
+}
+
+/* Buttons */
+.home-buttons {
+  margin-top: 40px;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  background: #0a66c2;
+  color: #fff;
+  padding: 14px 32px;
+  border-radius: 30px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-primary:hover {
+  background: #084d99;
+}
+
+.btn-outline {
+  background: transparent;
+  color: #0a66c2;
+  padding: 14px 32px;
+  border-radius: 30px;
+  border: 2px solid #0a66c2;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-outline:hover {
+  background: #0a66c2;
+  color: #fff;
+}
+
+/* Right visual */
+.home-visual {
+  width: 380px;
+  height: 380px;
+  background: #eef5ff;
+  border-radius: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0a66c2;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* 📱 Mobile */
+@media (max-width: 768px) {
+  .home-container {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .home-content h1 {
+    font-size: 42px;
+  }
+
+  .home-buttons {
+    justify-content: center;
+  }
+
+  .home-visual {
+    margin: auto;
+    width: 280px;
+    height: 280px;
+  }
+}
