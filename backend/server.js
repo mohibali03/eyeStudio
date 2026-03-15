@@ -22,7 +22,9 @@ const app = express();
 
 // ✅ 2. Middleware
 app.use(cors({
-  origin: process.env.CLIENT_URL || "http://localhost:5173",
+  origin: process.env.CLIENT_URL
+    ? process.env.CLIENT_URL.split(",").map(u => u.trim())
+    : true,
   credentials: true,
 }));
 app.use(express.json());
@@ -39,9 +41,17 @@ app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/eye-tests", eyeTestRoutes);
 
-// ✅ 5. Test route
+// ✅ 5. Test routes
 app.get("/", (req, res) => {
   res.send("eyeStudio backend is running");
+});
+app.get("/api/health", (req, res) => {
+  res.json({
+    status: "ok",
+    mongo: process.env.MONGO_URI ? "set" : "MISSING",
+    jwt:   process.env.JWT_SECRET ? "set" : "MISSING",
+    cors:  process.env.CLIENT_URL || "open (CLIENT_URL not set)",
+  });
 });
 
 // ✅ 6. Start server
