@@ -7,7 +7,9 @@ import { protect, adminOnly } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-cloudinary.config({ cloudinary_url: process.env.CLOUDINARY_URL });
+if (process.env.CLOUDINARY_URL) {
+  cloudinary.config({ url: process.env.CLOUDINARY_URL });
+}
 
 const storage = new CloudinaryStorage({
   cloudinary,

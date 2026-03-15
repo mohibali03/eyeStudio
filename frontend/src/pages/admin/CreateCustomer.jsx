@@ -23,11 +23,12 @@ const CreateCustomer = () => {
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify(customer),
     });
+    const data = await res.json();
     if (res.ok) {
       setToast({ message: "Customer created successfully", type: "success" });
       setTimeout(() => navigate("/admin/manage-customers"), 1500);
     } else {
-      setToast({ message: "Failed to create customer", type: "error" });
+      setToast({ message: data.message || "Failed to create customer", type: "error" });
     }
   };
 
