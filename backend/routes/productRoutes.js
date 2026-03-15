@@ -20,9 +20,15 @@ const storage = new CloudinaryStorage({
 const upload = multer({ storage });
 
 // Upload image
-router.post("/upload", protect, adminOnly, upload.single("image"), (req, res) => {
-  if (!req.file) return res.status(400).json({ message: "No file uploaded" });
-  res.json({ imageUrl: req.file.path });
+router.post("/upload", protect, adminOnly, (req, res, next) => {
+  upload.single("image")(req, res, (err) => {
+    if (err) {
+      console.error("Cloudinary upload error:", err);
+      return res.status(500).json({ message: "Image upload failed", error: err.message });
+    }
+    if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+    res.json({ imageUrl: req.file.path });
+  });
 });
 
 // Get all products (public)

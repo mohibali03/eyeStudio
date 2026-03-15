@@ -25,8 +25,9 @@ const CreateProduct = () => {
       const fd = new FormData();
       fd.append("image", imageFile);
       const up = await fetch(`${API_BASE_URL}/products/upload`, { method: "POST", headers: { Authorization: `Bearer ${token}` }, body: fd });
-      if (!up.ok) { setToast({ message: "Image upload failed", type: "error" }); return; }
-      imageUrl = (await up.json()).imageUrl;
+      const upData = await up.json();
+      if (!up.ok) { setToast({ message: upData.error || upData.message || "Image upload failed", type: "error" }); return; }
+      imageUrl = upData.imageUrl;
     }
     const res = await fetch(`${API_BASE_URL}/products`, {
       method: "POST",
