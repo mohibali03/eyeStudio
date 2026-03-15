@@ -3,6 +3,10 @@ node_modules/
 .pnp
 .pnp.js
 
+# ── Lock files (platform-specific, causes Linux/Windows mismatch on Render) ──
+package-lock.json
+yarn.lock
+
 # ── Environment Variables (NEVER commit these) ─────────────
 .env
 .env.local
