@@ -43,6 +43,7 @@ export default function CustomerProfile() {
                 <div>
                   <p className="cd-profile-name">{profile.name}</p>
                   <p className="cd-profile-email">{profile.email}</p>
+                  {profile.phone && <p className="cd-profile-email">📞 {profile.phone}</p>}
                 </div>
               </div>
               <p style={{ fontSize: 12, color: "var(--muted)" }}>

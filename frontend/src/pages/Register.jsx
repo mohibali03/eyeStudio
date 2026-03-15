@@ -9,6 +9,7 @@ const Register = () => {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -21,7 +22,8 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    if (!name || !email || !password) { setError("All fields are required"); return; }
+    if (!name || !email || !phone || !password) { setError("All fields are required"); return; }
+    if (!/^[0-9]{10}$/.test(phone)) { setError("Phone number must be exactly 10 digits."); return; }
     const { valid } = validatePassword(password);
     if (!valid) {
       setError("Password does not meet the requirements below.");
@@ -33,7 +35,7 @@ const Register = () => {
       const res = await fetch(`${API_BASE_URL}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, phone, password }),
       });
       const data = await res.json();
       if (!res.ok) { setError(data.message || "Registration failed"); return; }
@@ -88,6 +90,19 @@ const Register = () => {
             <div className="auth-field">
               <label>Email address</label>
               <input type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} />
+            </div>
+            <div className="auth-field">
+              <label>Phone Number</label>
+              <input
+                type="tel"
+                placeholder="10-digit mobile number"
+                value={phone}
+                maxLength={10}
+                onChange={e => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
+              />
+              {phone && !/^[0-9]{10}$/.test(phone) && (
+                <p style={{ color: "#ef4444", fontSize: 12, marginTop: 4 }}>Must be exactly 10 digits</p>
+              )}
             </div>
             <div className="auth-field">
               <label>Password</label>

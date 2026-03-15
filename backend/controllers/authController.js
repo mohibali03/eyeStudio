@@ -8,7 +8,7 @@ const PW_MESSAGE = "Password must be 8–20 characters and include uppercase, lo
 
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, phone } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({ message: "All fields required" });
@@ -18,13 +18,17 @@ export const registerUser = async (req, res) => {
       return res.status(400).json({ message: PW_MESSAGE });
     }
 
+    if (phone && !/^[0-9]{10}$/.test(phone)) {
+      return res.status(400).json({ message: "Phone number must be exactly 10 digits." });
+    }
+
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({ message: "User already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    await User.create({ name, email, password: hashedPassword, role: "customer" });
+    await User.create({ name, email, password: hashedPassword, phone: phone || "", role: "customer" });
 
     res.status(201).json({ message: "User registered successfully" });
   } catch (error) {

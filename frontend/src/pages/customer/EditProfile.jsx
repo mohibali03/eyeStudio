@@ -10,7 +10,7 @@ import "../../styles/auth.css";
 
 export default function EditProfile() {
   const { token, login, user } = useAuth();
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", password: "" });
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
@@ -18,7 +18,7 @@ export default function EditProfile() {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((r) => r.json())
-      .then((d) => setForm({ name: d.name, email: d.email, password: "" }))
+      .then((d) => setForm({ name: d.name, email: d.email, phone: d.phone || "", password: "" }))
       .catch(() => setToast({ message: "Failed to load profile", type: "error" }));
   }, [token]);
 
@@ -36,7 +36,7 @@ export default function EditProfile() {
         return;
       }
     }
-    const body = { name: form.name, email: form.email };
+    const body = { name: form.name, email: form.email, phone: form.phone };
     if (form.password) body.password = form.password;
 
     const res = await fetch(`${API_BASE_URL}/users/profile`, {
@@ -46,7 +46,7 @@ export default function EditProfile() {
     });
     const data = await res.json();
     if (res.ok) {
-      login({ ...user, name: data.name, email: data.email }, token);
+      login({ ...user, name: data.name, email: data.email, phone: data.phone }, token);
       setForm((f) => ({ ...f, password: "" }));
       setToast({ message: "Profile updated successfully", type: "success" });
     } else {
@@ -84,6 +84,19 @@ export default function EditProfile() {
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   required
                 />
+              </div>
+              <div>
+                <label>Phone Number</label>
+                <input
+                  type="tel"
+                  value={form.phone}
+                  maxLength={10}
+                  placeholder="10-digit mobile number"
+                  onChange={e => setForm({ ...form, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })}
+                />
+                {form.phone && !/^[0-9]{10}$/.test(form.phone) && (
+                  <p style={{ color: "#ef4444", fontSize: 12, marginTop: 4 }}>Must be exactly 10 digits</p>
+                )}
               </div>
               <div>
                 <label>
