@@ -7,8 +7,14 @@ import { protect, adminOnly } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
+// Parse CLOUDINARY_URL manually (required in Node.js ESM environment)
 if (process.env.CLOUDINARY_URL) {
-  cloudinary.config({ url: process.env.CLOUDINARY_URL });
+  const url = new URL(process.env.CLOUDINARY_URL);
+  cloudinary.config({
+    cloud_name: url.host,
+    api_key: url.username,
+    api_secret: url.password,
+  });
 }
 
 const storage = new CloudinaryStorage({

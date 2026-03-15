@@ -22,12 +22,26 @@ const CreateProduct = () => {
     e.preventDefault();
     let imageUrl = "";
     if (imageFile) {
-      const fd = new FormData();
-      fd.append("image", imageFile);
-      const up = await fetch(`${API_BASE_URL}/products/upload`, { method: "POST", headers: { Authorization: `Bearer ${token}` }, body: fd });
-      const upData = await up.json();
-      if (!up.ok) { setToast({ message: upData.error || upData.message || "Image upload failed", type: "error" }); return; }
-      imageUrl = upData.imageUrl;
+      const allowed = ["image/jpeg", "image/png", "image/webp"];
+      if (!allowed.includes(imageFile.type)) {
+        setToast({ message: "Image format not supported. Use JPG, PNG, or WebP.", type: "error" });
+        return;
+      }
+      try {
+        const fd = new FormData();
+        fd.append("image", imageFile);
+        const up = await fetch(`${API_BASE_URL}/products/upload`, { method: "POST", headers: { Authorization: `Bearer ${token}` }, body: fd });
+        const upData = await up.json();
+        if (!up.ok) {
+          const reason = upData.error || upData.message || "Upload service error";
+          setToast({ message: `Image upload failed: ${reason}`, type: "error" });
+          return;
+        }
+        imageUrl = upData.imageUrl;
+      } catch {
+        setToast({ message: "Image upload failed: Network issue. Check your connection.", type: "error" });
+        return;
+      }
     }
     const res = await fetch(`${API_BASE_URL}/products`, {
       method: "POST",
