@@ -1,23 +1,28 @@
 import express from "express";
 import multer from "multer";
-import path from "path";
+import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
 import Product from "../models/Product.js";
 import { protect, adminOnly } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-const storage = multer.diskStorage({
-  destination: "uploads/",
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  },
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key:    process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: { folder: "eyestudio", allowed_formats: ["jpg", "jpeg", "png", "webp"] },
 });
 const upload = multer({ storage });
 
 // Upload image
 router.post("/upload", protect, adminOnly, upload.single("image"), (req, res) => {
   if (!req.file) return res.status(400).json({ message: "No file uploaded" });
-  res.json({ imageUrl: `/uploads/${req.file.filename}` });
+  res.json({ imageUrl: req.file.path });
 });
 
 // Get all products (public)
