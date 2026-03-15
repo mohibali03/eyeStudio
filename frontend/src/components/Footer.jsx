@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
-import { FaInstagram } from "react-icons/fa";
-import { MapPin, Phone, Clock } from "lucide-react";
+import { MapPin, Phone, Clock, Instagram } from "lucide-react";
 import "../styles/footer.css";
 
 const Footer = () => (
@@ -11,7 +10,7 @@ const Footer = () => (
         <p className="footer-description">Your vision, our mission. Premium eyewear and professional eye care services in Vadodara.</p>
         <div className="footer-social">
           <a href="https://www.instagram.com/eye_studio_optical_store/" target="_blank" rel="noopener noreferrer" title="Instagram">
-            <FaInstagram size={18} />
+            <Instagram size={18} />
           </a>
         </div>
       </div>
