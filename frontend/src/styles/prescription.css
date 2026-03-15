@@ -1,96 +1,154 @@
-.prescription-container {
-  max-width: 1100px;
-  margin: auto;
+.prescription-page {
+  background: var(--bg);
+  min-height: calc(100vh - 64px);
   padding: 40px 20px;
 }
 
-.prescription-container h2 {
-  font-size: 28px;
-  color: #0a66c2;
-  margin-bottom: 30px;
+.prescription-page-header {
+  max-width: 1000px;
+  margin: 0 auto 28px;
+}
+.prescription-page-header h2 {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text);
+}
+.prescription-page-header p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-top: 4px;
 }
 
-/* Card */
 .prescription-card {
-  background: #fff;
-  padding: 24px;
-  border-radius: 14px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
-  margin-bottom: 30px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+  overflow: hidden;
 }
 
-.prescription-card h3 {
-  margin-bottom: 16px;
-  color: #084d99;
+.prescription-card-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.prescription-card-header h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
 }
 
-/* Table */
 .prescription-table {
   width: 100%;
   border-collapse: collapse;
 }
-
-.prescription-table th,
-.prescription-table td {
-  border: 1px solid #e3e3e3;
-  padding: 10px;
-  text-align: center;
-}
-
 .prescription-table th {
-  background: #f2f7ff;
-  font-weight: 600;
+  padding: 10px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--text-muted);
+  background: var(--bg);
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+.prescription-table td {
+  padding: 10px 8px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.prescription-table tr:last-child td { border-bottom: none; }
+.prescription-table td:first-child {
+  font-weight: 700;
+  color: var(--text);
+  font-size: 13px;
+  padding-left: 20px;
+  text-align: left;
 }
 
 .prescription-table input {
   width: 100%;
-  padding: 6px;
-  border: 1px solid #ccc;
+  padding: 7px 10px;
+  border: 1.5px solid var(--border);
   border-radius: 6px;
+  font-size: 13px;
+  text-align: center;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--bg);
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.prescription-table input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+  background: #fff;
 }
 
-/* PD section */
 .pd-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
+  padding: 20px 24px;
 }
-
 .pd-grid label {
   display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
   margin-bottom: 6px;
-  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .04em;
 }
-
 .pd-grid input {
   width: 100%;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--bg);
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.pd-grid input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+  background: #fff;
 }
 
-/* Save Button */
-.save-btn {
-  background: #0a66c2;
-  color: white;
-  padding: 14px 40px;
+.prescription-save-wrap {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+.prescription-save-btn {
+  padding: 12px 32px;
+  background: var(--primary);
+  color: #fff;
   border: none;
-  border-radius: 30px;
-  font-size: 16px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 700;
   cursor: pointer;
+  transition: var(--transition);
+}
+.prescription-save-btn:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(37,99,235,.3);
 }
 
-.save-btn:hover {
-  background: #084d99;
-}
-
-/* 📱 Mobile */
 @media (max-width: 768px) {
-  .prescription-table {
-    font-size: 14px;
-  }
-
-  .pd-grid {
-    grid-template-columns: 1fr;
-  }
+  .pd-grid { grid-template-columns: 1fr; }
+  .prescription-table { font-size: 12px; }
+  .prescription-table th, .prescription-table td { padding: 8px 4px; }
 }

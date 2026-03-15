@@ -2,11 +2,19 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
+/* ── Password validation (mirrors frontend rules) ── */
+const PW_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]).{8,20}$/;
+const PW_MESSAGE = "Password must be 8–20 characters and include uppercase, lowercase, number, and special character.";
+
 export const registerUser = async (req, res) => {
   const { name, email, password } = req.body;
 
   if (!name || !email || !password) {
     return res.status(400).json({ message: "All fields required" });
+  }
+
+  if (!PW_REGEX.test(password)) {
+    return res.status(400).json({ message: PW_MESSAGE });
   }
 
   const userExists = await User.findOne({ email });

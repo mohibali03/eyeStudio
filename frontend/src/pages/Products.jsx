@@ -1,113 +1,99 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "../components/Header";
+import Footer from "../components/Footer";
 import { Link } from "react-router-dom";
-
-const allProducts = [
-  { id: 1, name: "Classic Round Frame", price: 1999, category: "Men" },
-  { id: 2, name: "Modern Square Frame", price: 2499, category: "Women" },
-  { id: 3, name: "Kids Comfort Frame", price: 1299, category: "Kids" },
-  { id: 4, name: "Premium Blue Cut Frame", price: 3499, category: "Unisex" },
-];
+import { API_BASE_URL } from "../config/api";
+import { SlidersHorizontal, Glasses, ArrowRight } from "lucide-react";
+import "../styles/products.css";
 
 const Products = () => {
+  const [allProducts, setAllProducts] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [priceRange, setPriceRange] = useState("All");
 
-  // Handle checkbox
-  const handleCategoryChange = (category) => {
-    setSelectedCategories((prev) =>
-      prev.includes(category)
-        ? prev.filter((c) => c !== category)
-        : [...prev, category]
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/products`)
+      .then(r => r.json())
+      .then(setAllProducts)
+      .catch(() => {});
+  }, []);
+
+  const toggleCategory = (cat) =>
+    setSelectedCategories(prev =>
+      prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
     );
-  };
 
-  // Filter logic
-  const filteredProducts = allProducts.filter((product) => {
-    const categoryMatch =
-      selectedCategories.length === 0 ||
-      selectedCategories.includes(product.category);
-
-    let priceMatch = true;
-    if (priceRange === "under1500") priceMatch = product.price < 1500;
-    if (priceRange === "1500to3000")
-      priceMatch = product.price >= 1500 && product.price <= 3000;
-    if (priceRange === "above3000") priceMatch = product.price > 3000;
-
-    return categoryMatch && priceMatch;
+  const filtered = allProducts.filter(p => {
+    const catOk = selectedCategories.length === 0 || selectedCategories.includes(p.category);
+    let priceOk = true;
+    if (priceRange === "under1500")   priceOk = p.price < 1500;
+    if (priceRange === "1500to3000")  priceOk = p.price >= 1500 && p.price <= 3000;
+    if (priceRange === "above3000")   priceOk = p.price > 3000;
+    return catOk && priceOk;
   });
 
   return (
     <>
       <Header />
+      <div className="products-page">
+        <div className="products-page-header">
+          <h1>Eyewear Collection</h1>
+          <p>{filtered.length} products found</p>
+        </div>
 
-      <section className="w-full bg-white">
-        <div className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 lg:grid-cols-4 gap-10">
-          {/* Filters */}
-          <aside>
-            <h3 className="text-xl font-semibold mb-6">Filters</h3>
+        <div className="products-wrapper">
+          <aside className="products-sidebar">
+            <h3><SlidersHorizontal size={16} /> Filters</h3>
 
-            {/* Category */}
-            <div className="mb-6">
-              <h4 className="font-medium mb-3">Category</h4>
-              {["Men", "Women", "Kids", "Unisex"].map((cat) => (
-                <label key={cat} className="flex items-center gap-2 mb-2">
-                  <input
-                    type="checkbox"
-                    onChange={() => handleCategoryChange(cat)}
-                  />
+            <div className="filter-group">
+              <h4>Category</h4>
+              {["Men", "Women", "Kids", "Unisex"].map(cat => (
+                <label key={cat}>
+                  <input type="checkbox" onChange={() => toggleCategory(cat)} checked={selectedCategories.includes(cat)} />
                   {cat}
                 </label>
               ))}
             </div>
 
-            {/* Price */}
-            <div>
-              <h4 className="font-medium mb-3">Price Range</h4>
-              <select
-                className="w-full border rounded-lg px-3 py-2"
-                onChange={(e) => setPriceRange(e.target.value)}
-              >
-                <option value="All">All</option>
-                <option value="under1500">Under ₹1500</option>
-                <option value="1500to3000">₹1500 - ₹3000</option>
-                <option value="above3000">Above ₹3000</option>
+            <div className="filter-group">
+              <h4>Price Range</h4>
+              <select value={priceRange} onChange={e => setPriceRange(e.target.value)}>
+                <option value="All">All Prices</option>
+                <option value="under1500">Under ₹1,500</option>
+                <option value="1500to3000">₹1,500 – ₹3,000</option>
+                <option value="above3000">Above ₹3,000</option>
               </select>
             </div>
           </aside>
 
-          {/* Products */}
-          <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredProducts.length === 0 ? (
-              <p>No products found.</p>
-            ) : (
-              filteredProducts.map((product) => (
-                <div
-                  key={product.id}
-                  className="border rounded-2xl p-5 hover:shadow-lg transition"
-                >
-                  <div className="h-40 bg-light rounded-xl flex items-center justify-center text-primary">
-                    Frame Image
-                  </div>
-
-                  <h3 className="mt-4 font-semibold">{product.name}</h3>
-                  <p className="text-gray-500">{product.category}</p>
-                  <p className="mt-2 text-primary font-bold">
-                    ₹{product.price}
-                  </p>
-
-                  <Link
-                    to={`/products/${product.id}`}
-                    className="mt-4 block text-center bg-primary text-white py-2 rounded-full"
-                  >
-                    View Details
+          <div className="products-grid">
+            {filtered.length === 0 ? (
+              <div className="no-products">
+                <Glasses size={48} style={{marginBottom:12,opacity:.3}} />
+                <p>No products found matching your filters.</p>
+              </div>
+            ) : filtered.map(product => (
+              <div key={product._id} className="product-card">
+                <div className="product-image">
+                  {product.imageUrl
+                    ? <img src={product.imageUrl.startsWith("http") ? product.imageUrl : `http://localhost:5000${product.imageUrl}`} alt={product.name} />
+                    : <div className="placeholder-image"><Glasses size={52} /></div>
+                  }
+                </div>
+                <div className="product-info">
+                  <h3>{product.name}</h3>
+                  <span className="product-category">{product.category}</span>
+                  <p className="product-price">₹{product.price.toLocaleString()}</p>
+                  <Link to={`/products/${product._id}`} className="view-btn">
+                    View Details <ArrowRight size={13} style={{display:"inline",verticalAlign:"middle",marginLeft:4}} />
                   </Link>
                 </div>
-              ))
-            )}
+              </div>
+            ))}
           </div>
         </div>
-      </section>
+      </div>
+      <Footer />
     </>
   );
 };

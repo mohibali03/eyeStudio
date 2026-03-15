@@ -1,0 +1,78 @@
+.customer-container {
+  padding: 40px;
+  max-width: 1100px;
+  margin: auto;
+}
+
+.customer-tabs {
+  margin: 20px 0;
+}
+
+.customer-tabs button {
+  padding: 10px 20px;
+  border: none;
+  background: #e5e7eb;
+  margin-right: 10px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.customer-tabs .active {
+  background: #0a66c2;
+  color: white;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th, td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 400px;
+  margin-top: 16px;
+}
+
+.profile-form label {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.profile-form input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.profile-save-btn {
+  padding: 10px;
+  background: #0a66c2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.profile-msg {
+  color: green;
+  font-size: 13px;
+  margin-top: 4px;
+}

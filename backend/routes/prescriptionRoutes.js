@@ -1,5 +1,6 @@
 import express from "express";
 import Prescription from "../models/Prescription.js";
+import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -23,4 +24,10 @@ router.post("/:customerId", async (req, res) => {
   }
 });
 
-export default router; // ✅ THIS WAS MISSING
+router.get("/my", protect, async (req, res) => {
+  const prescription = await Prescription.findOne({
+    customer: req.user.id,
+  });
+  res.json(prescription);
+});
+export default router;

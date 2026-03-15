@@ -9,9 +9,16 @@ const CustomerList = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/users`)
+    const token = localStorage.getItem("token");
+
+    fetch(`${API_BASE_URL}/users`, {
+      headers: {
+        Authorization: `Bearer ${token}`, // 🔐 ADMIN AUTH
+      },
+    })
       .then((res) => res.json())
-      .then((data) => setCustomers(data));
+      .then((data) => setCustomers(data))
+      .catch(() => alert("Failed to load customers"));
   }, []);
 
   return (
@@ -19,7 +26,7 @@ const CustomerList = () => {
       <Header />
 
       <div className="admin-container">
-        <h2>Customers</h2>
+        <h2>Customer List</h2>
 
         <div className="admin-card">
           <table className="admin-table">
@@ -27,7 +34,7 @@ const CustomerList = () => {
               <tr>
                 <th>Name</th>
                 <th>Email</th>
-                <th>Action</th>
+                <th>Actions</th>
               </tr>
             </thead>
 
@@ -36,7 +43,7 @@ const CustomerList = () => {
                 <tr key={user._id}>
                   <td>{user.name}</td>
                   <td>{user.email}</td>
-                  <td>
+                  <td style={{ display: "flex", gap: "10px" }}>
                     <button
                       className="admin-btn"
                       onClick={() =>
@@ -44,6 +51,15 @@ const CustomerList = () => {
                       }
                     >
                       Add Prescription
+                    </button>
+
+                    <button
+                      className="admin-btn"
+                      onClick={() =>
+                        navigate(`/admin/orders/create/${user._id}`)
+                      }
+                    >
+                      Create Order
                     </button>
                   </td>
                 </tr>

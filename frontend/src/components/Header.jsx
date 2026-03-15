@@ -1,48 +1,71 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { Menu, X } from "lucide-react";
+import ProfileMenu from "./ProfileMenu";
 import "../styles/header.css";
 
 const Header = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
+  const isActive = (path) => location.pathname === path ? "active" : "";
+  const dashboardPath = user?.role === "admin" ? "/admin" : "/dashboard";
+
+  const navLinks = [
+    { to: "/",          label: "Home" },
+    ...(user ? [{ to: dashboardPath, label: "Dashboard" }] : []),
+    { to: "/products",  label: "Products" },
+    { to: "/lens-guide",label: "Lens Guide" },
+    { to: "/book-test", label: "Book Test" },
+  ];
 
   return (
-    <header className="header">
-      <div className="logo">
-        <span>eye</span>Studio
-      </div>
+    <>
+      <header className="header">
+        <div className="header-inner">
+          <Link to="/" className="logo"><span>eye</span>Studio</Link>
 
-      <nav className="nav">
-        <Link to="/">Home</Link>
-        <Link to="/products">Products</Link>
-        <Link to="/lens-guide">Lens Guide</Link>
-        <Link to="/book-test">Book Test</Link>
-      </nav>
+          <nav className="nav">
+            {navLinks.map(({ to, label }) => (
+              <Link key={to} to={to} className={isActive(to)}>{label}</Link>
+            ))}
+          </nav>
 
-      {/* Right side auth buttons */}
-      <div>
-        {user ? (
-          <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
-            <span style={{ fontWeight: 500 }}>
-              Hi, {user.name}
-            </span>
-
-            <button className="login-btn" onClick={handleLogout}>
-              Logout
+          <div className="header-right">
+            {user ? (
+              <ProfileMenu />
+            ) : (
+              <Link to="/login">
+                <button className="login-btn">Login</button>
+              </Link>
+            )}
+            <button className="hamburger" onClick={() => setMobileOpen((o) => !o)}>
+              {mobileOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
+        </div>
+      </header>
+
+      {/* Mobile Nav */}
+      <div className={`mobile-nav${mobileOpen ? " open" : ""}`}>
+        {navLinks.map(({ to, label }) => (
+          <Link key={to} to={to} onClick={() => setMobileOpen(false)}>{label}</Link>
+        ))}
+        {user ? (
+          <button
+            style={{ padding: "10px 14px", background: "none", border: "none", textAlign: "left", color: "var(--danger)", fontWeight: 600, cursor: "pointer", fontSize: 14 }}
+            onClick={() => { logout(); navigate("/login"); setMobileOpen(false); }}
+          >
+            Logout
+          </button>
         ) : (
-          <Link to="/login">
-            <button className="login-btn">Login</button>
-          </Link>
+          <Link to="/login" onClick={() => setMobileOpen(false)}>Login</Link>
         )}
       </div>
-    </header>
+    </>
   );
 };
 

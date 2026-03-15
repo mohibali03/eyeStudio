@@ -1,13 +1,21 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
 
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import prescriptionRoutes from "./routes/prescriptionRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
+import productRoutes from "./routes/productRoutes.js";
+import eyeTestRoutes from "./routes/eyeTestRoutes.js";
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // ✅ 1. Create app FIRST
 const app = express();
@@ -15,6 +23,7 @@ const app = express();
 // ✅ 2. Middleware
 app.use(cors());
 app.use(express.json());
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // ✅ 3. Connect DB
 connectDB();
@@ -23,6 +32,9 @@ connectDB();
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/prescriptions", prescriptionRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/eye-tests", eyeTestRoutes);
 
 // ✅ 5. Test route
 app.get("/", (req, res) => {
