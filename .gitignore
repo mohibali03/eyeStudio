@@ -1,24 +1,67 @@
-# Logs
-logs
+# ── Dependencies ──────────────────────────────────────────
+node_modules/
+.pnp
+.pnp.js
+
+# ── Environment Variables (NEVER commit these) ─────────────
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+
+# ── Build Output ───────────────────────────────────────────
+dist/
+dist-ssr/
+build/
+out/
+
+# ── Vite Cache ─────────────────────────────────────────────
+.vite/
+
+# ── Logs ───────────────────────────────────────────────────
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# ── Coverage ───────────────────────────────────────────────
+coverage/
+*.lcov
+.nyc_output/
 
-# Editor directories and files
+# ── OS Files ───────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ── Editor ─────────────────────────────────────────────────
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+*.swp
+
+# ── Runtime ────────────────────────────────────────────────
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# ── Uploads (user-generated content, not source code) ──────
+backend/uploads/*
+!backend/uploads/.gitkeep
