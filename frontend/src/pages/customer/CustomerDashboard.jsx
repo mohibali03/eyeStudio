@@ -18,6 +18,7 @@ export default function CustomerDashboard() {
   const [activeTab, setActiveTab] = useState("orders");
   const [orders, setOrders] = useState([]);
   const [prescription, setPrescription] = useState(null);
+  const [prescriptionError, setPrescriptionError] = useState(false);
   const [toast, setToast] = useState(null);
   const showToast = (message, type = "success") => setToast({ message, type });
 
@@ -29,8 +30,11 @@ export default function CustomerDashboard() {
 
   useEffect(() => {
     if (activeTab === "prescription") {
-      fetch(`${API_BASE_URL}/prescriptions/my`, { headers: { Authorization: `Bearer ${token}` } })
-        .then(r => r.json()).then(setPrescription).catch(() => {});
+      setPrescriptionError(false);
+      fetch(`${API_BASE_URL}/prescriptions/my`, { headers: { Authorization: `Bearer ${token}` }, credentials: "include" })
+        .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+        .then(d => setPrescription(Array.isArray(d) ? (d[0] || null) : d))
+        .catch(() => setPrescriptionError(true));
     }
   }, [activeTab, token]);
 
@@ -146,8 +150,10 @@ export default function CustomerDashboard() {
               <Eye size={16} color="#6366f1" />
               <h3>My Prescription</h3>
             </div>
-            {!prescription
-              ? <p className="cd-empty">No prescription available yet.</p>
+            {prescriptionError
+              ? <p className="cd-empty" style={{ color: "#ef4444" }}>Failed to load prescription. Please try again.</p>
+              : !prescription
+              ? <p className="cd-empty">No prescription available yet. Visit the store for an eye test.</p>
               : (
                 <>
                   <div className="cd-rx-grid">

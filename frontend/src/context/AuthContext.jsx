@@ -5,18 +5,18 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(
-    JSON.parse(localStorage.getItem("user")) || null
+    JSON.parse(sessionStorage.getItem("user")) || null
   );
-  // token kept in state/localStorage for Authorization header fallback
+  // token kept in state/sessionStorage — clears automatically when tab is closed
   const [token, setToken] = useState(
-    localStorage.getItem("token") || null
+    sessionStorage.getItem("token") || null
   );
 
   const login = (userData, receivedToken) => {
     setUser(userData);
     setToken(receivedToken);
-    localStorage.setItem("user", JSON.stringify(userData));
-    localStorage.setItem("token", receivedToken);
+    sessionStorage.setItem("user", JSON.stringify(userData));
+    sessionStorage.setItem("token", receivedToken);
     // Cookie is set by the server automatically on login response
   };
 
@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }) => {
     }
     setUser(null);
     setToken(null);
-    localStorage.clear();
+    sessionStorage.clear();
   };
 
   return (
