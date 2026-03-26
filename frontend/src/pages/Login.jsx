@@ -22,6 +22,7 @@ const Login = () => {
       const res = await fetch(`${API_BASE_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",   // receive HTTP-only cookie from server
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
