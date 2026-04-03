@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import AdminLayout from "../../components/AdminLayout";
 import Toast from "../../components/Toast";
 import { API_BASE_URL } from "../../config/api";
+import { useAuth } from "../../context/AuthContext";
 import { Eye, Save } from "lucide-react";
 import "../../styles/prescription.css";
 
@@ -10,6 +11,7 @@ const FIELDS = ["sph", "cyl", "axis", "dv", "nv", "add"];
 
 const Prescription = () => {
   const { customerId } = useParams();
+  const { token } = useAuth();
   const [formData, setFormData] = useState({
     rightEye: { sph: "", cyl: "", axis: "", dv: "", nv: "", add: "" },
     leftEye:  { sph: "", cyl: "", axis: "", dv: "", nv: "", add: "" },
@@ -24,13 +26,18 @@ const Prescription = () => {
     setFormData(prev => ({ ...prev, pd: { ...prev.pd, [field]: value } }));
 
   const handleSubmit = async () => {
-    const token = localStorage.getItem("token");
-    const res = await fetch(`${API_BASE_URL}/prescriptions/${customerId}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify(formData),
-    });
-    setToast({ message: res.ok ? "Prescription saved successfully" : "Failed to save prescription", type: res.ok ? "success" : "error" });
+    try {
+      const res = await fetch(`${API_BASE_URL}/prescriptions/${customerId}`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      setToast({ message: res.ok ? "Prescription saved successfully" : (data.message || "Failed to save prescription"), type: res.ok ? "success" : "error" });
+    } catch {
+      setToast({ message: "Network error. Please try again.", type: "error" });
+    }
   };
 
   return (

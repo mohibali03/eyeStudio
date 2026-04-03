@@ -2,24 +2,23 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/Header";
 import { API_BASE_URL } from "../../config/api";
+import { useAuth } from "../../context/AuthContext";
 import "../../styles/admin.css";
 
 const CustomerList = () => {
   const [customers, setCustomers] = useState([]);
   const navigate = useNavigate();
+  const { token } = useAuth();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-
     fetch(`${API_BASE_URL}/users`, {
-      headers: {
-        Authorization: `Bearer ${token}`, // 🔐 ADMIN AUTH
-      },
+      credentials: "include",
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
-      .then((data) => setCustomers(data))
+      .then((data) => setCustomers(Array.isArray(data) ? data : []))
       .catch(() => alert("Failed to load customers"));
-  }, []);
+  }, [token]);
 
   return (
     <>
