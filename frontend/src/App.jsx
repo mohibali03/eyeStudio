@@ -34,28 +34,12 @@ function App() {
       <Routes>
         {/* 🌐 Public Routes */}
         <Route path="/" element={<Home />} />
+        <Route path="/products" element={<Products />} />
+        <Route path="/products/:id" element={<ProductDetails />} />
         <Route path="/lens-guide" element={<LensGuide />} />
         <Route path="/book-test" element={<BookTest />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-
-        {/* 🔐 Protected User Routes */}
-        <Route
-          path="/products"
-          element={
-            <ProtectedRoute>
-              <Products />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/products/:id"
-          element={
-            <ProtectedRoute>
-              <ProductDetails />
-            </ProtectedRoute>
-          }
-        />
 
         {/* 🔐 ADMIN ROUTES (SECURED) */}
         <Route
