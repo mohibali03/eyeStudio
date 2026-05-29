@@ -541,15 +541,26 @@
   background: var(--bg);
   border-radius: 12px;
   border: 1px solid var(--border);
-  margin-bottom: 22px;
+  margin-bottom: 12px;
 }
 .share-preview-img {
-  width: 60px;
-  height: 60px;
+  width: 64px;
+  height: 64px;
   object-fit: cover;
   border-radius: 10px;
   flex-shrink: 0;
   border: 1px solid var(--border);
+}
+.share-preview-img-placeholder {
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
+  background: var(--bg-alt);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  flex-shrink: 0;
 }
 .share-preview-info { flex: 1; min-width: 0; }
 .share-preview-name {
@@ -578,6 +589,18 @@
   letter-spacing: .3px;
 }
 
+/* OG note */
+.share-og-note {
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: 9px 12px;
+  margin-bottom: 18px;
+  line-height: 1.5;
+}
+
 .share-section-label {
   font-size: 11px;
   font-weight: 700;
@@ -587,10 +610,10 @@
   margin-bottom: 10px;
 }
 
-/* Social share buttons */
+/* Social share buttons — 5 buttons in a row */
 .share-socials {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 8px;
   margin-bottom: 20px;
 }
@@ -599,10 +622,10 @@
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  padding: 12px 6px;
+  padding: 10px 4px;
   border-radius: 12px;
   text-decoration: none;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   color: var(--social-bg);
   background: color-mix(in srgb, var(--social-bg) 12%, transparent);
@@ -619,7 +642,7 @@
   justify-content: center;
 }
 
-/* Copy link row */
+/* Copy rows */
 .share-copy-row {
   display: flex;
   align-items: center;
@@ -628,6 +651,7 @@
   background: var(--bg);
   border-radius: 10px;
   border: 1px solid var(--border);
+  margin-bottom: 8px;
 }
 .share-copy-url {
   flex: 1;
@@ -655,6 +679,56 @@
 }
 .share-copy-btn:hover { background: var(--primary-hover); transform: scale(1.03); }
 .share-copy-btn.copied { background: #10b981; }
+
+.share-copy-details-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 9px;
+  background: none;
+  border: 1.5px dashed var(--border);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: border-color .15s, color .15s;
+}
+.share-copy-details-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+/* Share button loading state */
+.pd-btn-share.sharing {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* ── Share Toast ─────────────────────────────────────────────── */
+.share-toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  background: #1e293b;
+  color: #fff;
+  border-radius: 99px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 8px 32px rgba(0,0,0,.25);
+  z-index: 2000;
+  animation: toastIn .3s cubic-bezier(.34,1.56,.64,1);
+  white-space: nowrap;
+}
+.share-toast svg { color: #10b981; flex-shrink: 0; }
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(16px) scale(.9); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+}
 
 /* ═══════════════════════════════════════════════════════════════
    LOADING SKELETON
