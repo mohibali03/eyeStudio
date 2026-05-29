@@ -27,6 +27,7 @@ import ManageCustomers from "./pages/admin/ManageCustomers";
 import ManageProducts from "./pages/admin/ManageProducts";
 import AdminProfile from "./pages/admin/AdminProfile";
 import ManageOrders from "./pages/admin/ManageOrders";
+import ManageTrustBadges from "./pages/admin/ManageTrustBadges";
 
 function App() {
   return (
@@ -182,6 +183,14 @@ function App() {
           element={
             <AdminRoute>
               <ManageProducts />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/trust-badges"
+          element={
+            <AdminRoute>
+              <ManageTrustBadges />
             </AdminRoute>
           }
         />

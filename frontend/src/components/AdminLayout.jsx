@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import {
   LayoutDashboard, Users, Package, CalendarCheck,
-  UserCircle, LogOut, Menu, ShoppingCart,
+  UserCircle, LogOut, Menu, ShoppingCart, Shield,
 } from "lucide-react";
 import ProfileMenu from "./ProfileMenu";
 import "../styles/newDashboard.css";
@@ -50,7 +50,8 @@ export default function AdminLayout({ children, active, title, subtitle }) {
           <NavItem icon={Users}           label="Customers"         active={active === "customers"} onClick={() => navGo("/admin/manage-customers")}  collapsed={collapsed} />
           <NavItem icon={Package}         label="Products"          active={active === "products"}  onClick={() => navGo("/admin/manage-products")}   collapsed={collapsed} />
           <NavItem icon={ShoppingCart}    label="Orders"            active={active === "orders"}    onClick={() => navGo("/admin/orders")}            collapsed={collapsed} />
-          <NavItem icon={CalendarCheck}   label="Eye Test Bookings" active={active === "bookings"}  onClick={() => navGo("/admin/eye-test-bookings")} collapsed={collapsed} />
+          <NavItem icon={CalendarCheck}   label="Eye Test Bookings" active={active === "bookings"}      onClick={() => navGo("/admin/eye-test-bookings")} collapsed={collapsed} />
+          <NavItem icon={Shield}           label="Trust Badges"     active={active === "trust-badges"}  onClick={() => navGo("/admin/trust-badges")}      collapsed={collapsed} />
           {!collapsed && <li className="ds-nav-section">Account</li>}
           <NavItem icon={UserCircle}      label="My Profile"        active={active === "profile"}   onClick={() => navGo("/admin/profile")}           collapsed={collapsed} />
         </ul>
