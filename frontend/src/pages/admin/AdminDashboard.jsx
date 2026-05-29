@@ -31,7 +31,7 @@ import {
   Legend,
 } from "recharts";
 import { API_BASE_URL } from "../../config/api";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth, authFetch } from "../../context/AuthContext";
 import ProfileMenu from "../../components/ProfileMenu";
 import "../../styles/newDashboard.css";
 import "../../styles/manageOrders.css";
@@ -104,12 +104,12 @@ function AdminDashboardInner() {
   const [customers, setCustomers] = useState([]);
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/orders/stats`, { credentials: "include" })
+    authFetch(`${API_BASE_URL}/orders/stats`)
       .then((r) => r.json()).then(setStats).catch(() => {});
-    fetch(`${API_BASE_URL}/orders`, { credentials: "include" })
+    authFetch(`${API_BASE_URL}/orders`)
       .then((r) => r.json())
       .then((d) => setOrders(Array.isArray(d) ? d.slice(0, 5) : [])).catch(() => {});
-    fetch(`${API_BASE_URL}/users?limit=5`, { credentials: "include" })
+    authFetch(`${API_BASE_URL}/users?limit=5`)
       .then((r) => r.json())
       .then((d) => setCustomers(Array.isArray(d.customers) ? d.customers : [])).catch(() => {});
   }, []);

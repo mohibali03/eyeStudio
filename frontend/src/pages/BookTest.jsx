@@ -15,6 +15,10 @@ const BookTest = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!/^[0-9]{10}$/.test(formData.phone)) {
+      setToast({ message: "Phone number must be exactly 10 digits.", type: "error" });
+      return;
+    }
     const res = await fetch(`${API_BASE_URL}/eye-tests`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

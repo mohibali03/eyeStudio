@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Header from "../../components/Header";
 import Toast from "../../components/Toast";
 import { API_BASE_URL } from "../../config/api";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth, authFetch } from "../../context/AuthContext";
 import { PenLine, Eye, EyeOff } from "lucide-react";
 import { PASSWORD_RULES, validatePassword, passwordStrength } from "../../utils/passwordValidator";
 import "../../styles/newDashboard.css";
@@ -14,7 +14,7 @@ export default function EditProfile() {
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/users/profile`, { credentials: "include" })
+    authFetch(`${API_BASE_URL}/users/profile`)
       .then((r) => r.json())
       .then((d) => setForm({ name: d.name, email: d.email, phone: d.phone || "", password: "" }))
       .catch(() => setToast({ message: "Failed to load profile", type: "error" }));
@@ -37,9 +37,8 @@ export default function EditProfile() {
     const body = { name: form.name, email: form.email, phone: form.phone };
     if (form.password) body.password = form.password;
 
-    const res = await fetch(`${API_BASE_URL}/users/profile`, {
+    const res = await authFetch(`${API_BASE_URL}/users/profile`, {
       method: "PUT",
-      credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Header from "../../components/Header";
 import Toast from "../../components/Toast";
 import { API_BASE_URL } from "../../config/api";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth, authFetch } from "../../context/AuthContext";
 import {
   ShoppingBag, Eye, ClipboardList, Package,
 } from "lucide-react";
@@ -24,14 +24,14 @@ export default function CustomerDashboard() {
 
   // Fetch orders always (for stat cards too)
   useEffect(() => {
-    fetch(`${API_BASE_URL}/orders/my`, { credentials: "include" })
+    authFetch(`${API_BASE_URL}/orders/my`)
       .then(r => r.json()).then(d => setOrders(Array.isArray(d) ? d : [])).catch(() => {});
   }, []);
 
   useEffect(() => {
     if (activeTab === "prescription") {
       setPrescriptionError(false);
-      fetch(`${API_BASE_URL}/prescriptions/my`, { credentials: "include" })
+      authFetch(`${API_BASE_URL}/prescriptions/my`)
         .then(r => { if (!r.ok) throw new Error(); return r.json(); })
         .then(d => setPrescription(Array.isArray(d) ? (d[0] || null) : d))
         .catch(() => setPrescriptionError(true));

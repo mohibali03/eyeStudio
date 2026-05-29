@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import AdminLayout from "../../components/AdminLayout";
 import Toast from "../../components/Toast";
 import { API_BASE_URL } from "../../config/api";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth, authFetch } from "../../context/AuthContext";
 import "../../styles/newDashboard.css";
 import "../../styles/admin.css";
 import "../../styles/managepage.css";
@@ -18,7 +18,7 @@ const PrescriptionModal = ({ customer, onClose }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/prescriptions/customer/${customer._id}`, { credentials: "include" })
+    authFetch(`${API_BASE_URL}/prescriptions/customer/${customer._id}`)
       .then((r) => r.json())
       .then((data) => { setPrescriptions(Array.isArray(data) ? data : []); setLoading(false); })
       .catch(() => setLoading(false));
@@ -156,7 +156,7 @@ const ManageCustomers = () => {
 
   const fetchCustomers = useCallback(() => {
     const params = new URLSearchParams({ page: currentPage, limit: pageSize, search });
-    fetch(`${API_BASE_URL}/users?${params}`, { credentials: "include" })
+    authFetch(`${API_BASE_URL}/users?${params}`)
       .then((r) => r.json())
       .then((data) => {
         setCustomers(data.customers || []);
@@ -185,7 +185,7 @@ const ManageCustomers = () => {
     const url    = editingId ? `${API_BASE_URL}/users/${editingId}` : `${API_BASE_URL}/users`;
     const body   = editingId ? { name: form.name, email: form.email, phone: form.phone } : form;
 
-    const res  = await fetch(url, { method, credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    const res  = await authFetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     const data = await res.json();
     if (res.ok) {
       setShowForm(false); setEditingId(null);
@@ -199,7 +199,7 @@ const ManageCustomers = () => {
 
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this customer?")) return;
-    const res = await fetch(`${API_BASE_URL}/users/${id}`, { method: "DELETE", credentials: "include" });
+    const res = await authFetch(`${API_BASE_URL}/users/${id}`, { method: "DELETE" });
     if (res.ok) { fetchCustomers(); showToast("Customer deleted"); }
     else showToast("Failed to delete customer", "error");
   };

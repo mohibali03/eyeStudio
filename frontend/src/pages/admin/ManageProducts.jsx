@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import AdminLayout from "../../components/AdminLayout";
 import Toast from "../../components/Toast";
 import { API_BASE_URL } from "../../config/api";
+import { authFetch } from "../../context/AuthContext";
 import { X, Upload } from "lucide-react";
 import "../../styles/newDashboard.css";
 import "../../styles/admin.css";
@@ -68,8 +69,8 @@ const ManageProducts = () => {
     if (imageFiles.length > 0) {
       const fd = new FormData();
       imageFiles.forEach((f) => fd.append("images", f));
-      const uploadRes = await fetch(`${API_BASE_URL}/products/upload-multiple`, {
-        method: "POST", credentials: "include", body: fd,
+      const uploadRes = await authFetch(`${API_BASE_URL}/products/upload-multiple`, {
+        method: "POST", body: fd,
       });
       if (!uploadRes.ok) { showToast("Image upload failed", "error"); return; }
       const uploadData = await uploadRes.json();
@@ -78,9 +79,8 @@ const ManageProducts = () => {
     const method = editingId ? "PUT" : "POST";
     const url = editingId ? `${API_BASE_URL}/products/${editingId}` : `${API_BASE_URL}/products`;
 
-    const res = await fetch(url, {
+    const res = await authFetch(url, {
       method,
-      credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...form, imageUrl: images[0] || form.imageUrl || "", images, price: Number(form.price) }),
     });
@@ -110,8 +110,8 @@ const ManageProducts = () => {
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this product?")) return;
-    const res = await fetch(`${API_BASE_URL}/products/${id}`, {
-      method: "DELETE", credentials: "include",
+    const res = await authFetch(`${API_BASE_URL}/products/${id}`, {
+      method: "DELETE",
     });
     if (res.ok) { fetchProducts(); showToast("Product deleted"); }
     else showToast("Failed to delete product", "error");
@@ -137,7 +137,7 @@ const ManageProducts = () => {
           <div style={{ display: "flex", justifyContent: "flex-end" }}>
             <button
               className="save-btn"
-              onClick={() => { setShowForm(true); setEditingId(null); setForm({ name: "", price: "", category: "Men", frameType: "", description: "", imageUrl: "" }); setImageFile(null); setImagePreview(""); }}
+              onClick={() => { setShowForm(true); setEditingId(null); setForm({ name: "", price: "", category: "Men", frameType: "", description: "", imageUrl: "", images: [] }); setImageFiles([]); setPreviews([]); }}
             >
               + Add Product
             </button>

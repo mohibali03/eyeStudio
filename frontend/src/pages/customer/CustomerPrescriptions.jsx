@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Header from "../../components/Header";
 import { API_BASE_URL } from "../../config/api";
-import { useAuth } from "../../context/AuthContext";
+import { authFetch } from "../../context/AuthContext";
 import { Eye } from "lucide-react";
 import "../../styles/newDashboard.css";
 
@@ -13,13 +13,11 @@ export default function CustomerPrescriptions() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/prescriptions/my`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    authFetch(`${API_BASE_URL}/prescriptions/my`)
       .then((r) => r.json())
       .then((d) => { setPrescriptions(Array.isArray(d) ? d : d ? [d] : []); setLoading(false); })
       .catch(() => setLoading(false));
-  }, [token]);
+  }, []);
 
   return (
     <div className="cd-root">

@@ -42,8 +42,12 @@ router.post("/upload-multiple", protect, adminOnly, (req, res) => {
 
 // Get all products (public)
 router.get("/", async (req, res) => {
-  const products = await Product.find();
-  res.json(products);
+  try {
+    const products = await Product.find();
+    res.json(products);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch products" });
+  }
 });
 
 // Get single product
@@ -79,8 +83,12 @@ router.put("/:id", protect, adminOnly, async (req, res) => {
 
 // Delete product (admin only)
 router.delete("/:id", protect, adminOnly, async (req, res) => {
-  await Product.findByIdAndDelete(req.params.id);
-  res.json({ message: "Product deleted" });
+  try {
+    await Product.findByIdAndDelete(req.params.id);
+    res.json({ message: "Product deleted" });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to delete product" });
+  }
 });
 
 export default router;

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "../../components/Header";
 import Toast from "../../components/Toast";
 import { API_BASE_URL } from "../../config/api";
+import { authFetch } from "../../context/AuthContext";
 import { UserCircle, PenLine } from "lucide-react";
 import "../../styles/newDashboard.css";
 
@@ -12,7 +13,7 @@ export default function CustomerProfile() {
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/users/profile`, { credentials: "include" })
+    authFetch(`${API_BASE_URL}/users/profile`)
       .then((r) => r.json())
       .then(setProfile)
       .catch(() => setToast({ message: "Failed to load profile", type: "error" }));

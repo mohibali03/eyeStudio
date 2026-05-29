@@ -7,6 +7,9 @@ const router = express.Router();
 // Book eye test (public)
 router.post("/", async (req, res) => {
   try {
+    const { name, phone } = req.body;
+    if (!name || !phone) return res.status(400).json({ message: "Name and phone are required" });
+    if (!/^[0-9]{10}$/.test(phone)) return res.status(400).json({ message: "Phone must be exactly 10 digits" });
     const booking = await EyeTest.create(req.body);
     res.status(201).json(booking);
   } catch (err) {

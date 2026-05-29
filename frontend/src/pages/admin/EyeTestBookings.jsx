@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import AdminLayout from "../../components/AdminLayout";
 import Toast from "../../components/Toast";
 import { API_BASE_URL } from "../../config/api";
+import { authFetch } from "../../context/AuthContext";
 import { CalendarCheck } from "lucide-react";
 import "../../styles/newDashboard.css";
 import "../../styles/admin.css";
@@ -13,7 +14,7 @@ const EyeTestBookings = () => {
   const [toast, setToast]       = useState(null);
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/eye-tests`, { credentials: "include" })
+    authFetch(`${API_BASE_URL}/eye-tests`)
       .then((r) => {
         if (!r.ok) throw new Error(`Server error ${r.status}`);
         return r.json();
@@ -25,9 +26,8 @@ const EyeTestBookings = () => {
 
   const updateStatus = async (id, status) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/eye-tests/${id}`, {
+      const res = await authFetch(`${API_BASE_URL}/eye-tests/${id}`, {
         method: "PUT",
-        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });

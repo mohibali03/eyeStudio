@@ -6,6 +6,7 @@ import {
   User, Package, FileText, Calendar,
 } from "lucide-react";
 import { API_BASE_URL } from "../../config/api";
+import { authFetch } from "../../context/AuthContext";
 import AdminLayout from "../../components/AdminLayout";
 import Toast from "../../components/Toast";
 import "../../styles/newDashboard.css";
@@ -41,7 +42,7 @@ export default function ManageOrders() {
 
   const fetchOrders = () => {
     setLoading(true);
-    fetch(`${API_BASE_URL}/orders/all`, { credentials: "include" })
+    authFetch(`${API_BASE_URL}/orders/all`)
       .then(r => r.json())
       .then(d => { setOrders(Array.isArray(d) ? d : []); setLoading(false); })
       .catch(() => { setLoading(false); });
@@ -52,9 +53,8 @@ export default function ManageOrders() {
   const updateStatus = async (orderId, status) => {
     setUpdatingId(orderId);
     try {
-      const res = await fetch(`${API_BASE_URL}/orders/${orderId}/status`, {
+      const res = await authFetch(`${API_BASE_URL}/orders/${orderId}/status`, {
         method: "PUT",
-        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });

@@ -76,8 +76,9 @@ export const loginUser = async (req, res) => {
     res.cookie("token", token, cookieOptions);
     console.log(`[AUTH] Login OK: ${user.email} | role: ${user.role} | env: ${process.env.NODE_ENV} | cookie secure: ${cookieOptions.secure} | sameSite: ${cookieOptions.sameSite}`);
 
-    // Return user data only — token travels via HTTP-only cookie
+    // Return token in body AND set cookie — belt-and-suspenders for Render cross-origin
     res.json({
+      token,
       user: {
         id:    user._id,
         name:  user.name,

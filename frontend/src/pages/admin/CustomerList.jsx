@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/Header";
 import { API_BASE_URL } from "../../config/api";
+import { authFetch } from "../../context/AuthContext";
 import "../../styles/admin.css";
 
 const CustomerList = () => {
@@ -12,13 +13,12 @@ const CustomerList = () => {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`${API_BASE_URL}/users?limit=200`, { credentials: "include" })
+    authFetch(`${API_BASE_URL}/users?limit=200`)
       .then((res) => {
         if (!res.ok) throw new Error(`Server error ${res.status}`);
         return res.json();
       })
       .then((data) => {
-        // Backend returns paginated shape: { customers: [...], totalCount, ... }
         const list = data.customers ?? (Array.isArray(data) ? data : []);
         setCustomers(list);
       })

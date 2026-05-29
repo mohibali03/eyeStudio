@@ -8,7 +8,7 @@ import BookTest from "./pages/BookTest";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 
-import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedRoute from "./routes/ProtectedRoute";
 import AdminRoute from "./routes/AdminRoute";
 
 import AdminDashboard from "./pages/admin/AdminDashboard";

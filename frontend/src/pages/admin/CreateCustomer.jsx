@@ -3,14 +3,13 @@ import { useNavigate } from "react-router-dom";
 import AdminLayout from "../../components/AdminLayout";
 import Toast from "../../components/Toast";
 import { API_BASE_URL } from "../../config/api";
-import { useAuth } from "../../context/AuthContext";
+import { authFetch } from "../../context/AuthContext";
 import { UserPlus } from "lucide-react";
 import "../../styles/newDashboard.css";
 import "../../styles/form.css";
 
 const CreateCustomer = () => {
   const navigate = useNavigate();
-  const { token } = useAuth();
   const [customer, setCustomer] = useState({ name: "", email: "", password: "" });
   const [toast, setToast] = useState(null);
 
@@ -18,9 +17,9 @@ const CreateCustomer = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await fetch(`${API_BASE_URL}/users`, {
+    const res = await authFetch(`${API_BASE_URL}/users`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(customer),
     });
     const data = await res.json();

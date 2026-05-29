@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import AdminLayout from "../../components/AdminLayout";
 import Toast from "../../components/Toast";
 import { API_BASE_URL } from "../../config/api";
-import { useAuth } from "../../context/AuthContext";
+import { authFetch } from "../../context/AuthContext";
 import { ShoppingBag, Search, User, Package, IndianRupee, X } from "lucide-react";
 import "../../styles/newDashboard.css";
 import "../../styles/form.css";
@@ -134,11 +134,7 @@ const CreateOrder = () => {
 
   /* Fetch customer name */
   useEffect(() => {
-    fetch(`${API_BASE_URL}/users/profile`, { credentials: "include" })
-      .then((r) => r.json())
-      .catch(() => {});
-
-    fetch(`${API_BASE_URL}/users?limit=200`, { credentials: "include" })
+    authFetch(`${API_BASE_URL}/users?limit=200`)
       .then((r) => r.json())
       .then((data) => {
         const list = data.customers || [];
@@ -146,7 +142,7 @@ const CreateOrder = () => {
         setCustomer(found || null);
       })
       .catch(() => {});
-  }, [customerId, token]);
+  }, [customerId]);
 
   /* Fetch products */
   useEffect(() => {
@@ -173,9 +169,8 @@ const CreateOrder = () => {
       setToast({ message: "Please select a product from the search list", type: "error" });
       return;
     }
-    const res = await fetch(`${API_BASE_URL}/orders/${customerId}`, {
+    const res = await authFetch(`${API_BASE_URL}/orders/${customerId}`, {
       method: "POST",
-      credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         items: [{

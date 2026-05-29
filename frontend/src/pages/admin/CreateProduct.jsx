@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import AdminLayout from "../../components/AdminLayout";
 import Toast from "../../components/Toast";
 import { API_BASE_URL } from "../../config/api";
+import { authFetch } from "../../context/AuthContext";
 import { Package, Upload, X } from "lucide-react";
 import "../../styles/newDashboard.css";
 import "../../styles/form.css";
@@ -50,8 +51,8 @@ const CreateProduct = () => {
       try {
         const fd = new FormData();
         imageFiles.forEach((f) => fd.append("images", f));
-        const up = await fetch(`${API_BASE_URL}/products/upload-multiple`, {
-          method: "POST", credentials: "include", body: fd,
+        const up = await authFetch(`${API_BASE_URL}/products/upload-multiple`, {
+          method: "POST", body: fd,
         });
         const upData = await up.json();
         if (!up.ok) { setToast({ message: upData.message || "Upload failed", type: "error" }); setSaving(false); return; }
@@ -61,8 +62,8 @@ const CreateProduct = () => {
       }
     }
 
-    const res = await fetch(`${API_BASE_URL}/products`, {
-      method: "POST", credentials: "include",
+    const res = await authFetch(`${API_BASE_URL}/products`, {
+      method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...product, imageUrl: images[0] || "", images, price: Number(product.price) }),
     });

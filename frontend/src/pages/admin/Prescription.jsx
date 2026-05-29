@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import AdminLayout from "../../components/AdminLayout";
 import Toast from "../../components/Toast";
 import { API_BASE_URL } from "../../config/api";
+import { authFetch } from "../../context/AuthContext";
 import { Eye, Save } from "lucide-react";
 import "../../styles/prescription.css";
 
@@ -25,9 +26,8 @@ const Prescription = () => {
 
   const handleSubmit = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/prescriptions/${customerId}`, {
+      const res = await authFetch(`${API_BASE_URL}/prescriptions/${customerId}`, {
         method: "POST",
-        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });

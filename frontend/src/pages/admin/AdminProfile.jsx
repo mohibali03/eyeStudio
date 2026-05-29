@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import AdminLayout from "../../components/AdminLayout";
 import Toast from "../../components/Toast";
 import { API_BASE_URL } from "../../config/api";
+import { authFetch } from "../../context/AuthContext";
 import { UserCircle, Eye, EyeOff } from "lucide-react";
 import { PASSWORD_RULES, validatePassword, passwordStrength } from "../../utils/passwordValidator";
 import "../../styles/newDashboard.css";
@@ -15,7 +16,7 @@ export default function AdminProfile() {
   const showToast = (msg, type = "success") => setToast({ message: msg, type });
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/users/profile`, { credentials: "include" })
+    authFetch(`${API_BASE_URL}/users/profile`)
       .then(r => r.json())
       .then(d => { setProfile(d); setForm({ name: d.name, password: "" }); });
   }, []);
@@ -32,9 +33,8 @@ export default function AdminProfile() {
     }
     const body = { name: form.name };
     if (form.password) body.password = form.password;
-    const res = await fetch(`${API_BASE_URL}/users/profile`, {
+    const res = await authFetch(`${API_BASE_URL}/users/profile`, {
       method: "PUT",
-      credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });

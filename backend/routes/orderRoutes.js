@@ -40,8 +40,12 @@ router.get("/stats", protect, adminOnly, async (req, res) => {
 
 // 🔹 Get my orders (customer)
 router.get("/my", protect, async (req, res) => {
-  const orders = await Order.find({ customer: req.user._id }).sort({ createdAt: -1 });
-  res.json(orders);
+  try {
+    const orders = await Order.find({ customer: req.user._id }).sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 // 🔹 Get all orders (admin) - no limit, full list
@@ -59,8 +63,12 @@ router.get("/all", protect, adminOnly, async (req, res) => {
 
 // 🔹 Get all orders (admin) - dashboard preview
 router.get("/", protect, adminOnly, async (req, res) => {
-  const orders = await Order.find().populate("customer", "name email").sort({ createdAt: -1 }).limit(10);
-  res.json(orders);
+  try {
+    const orders = await Order.find().populate("customer", "name email").sort({ createdAt: -1 }).limit(10);
+    res.json(orders);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 // 🔹 Update order status (admin)
@@ -95,9 +103,13 @@ router.post("/:customerId", protect, adminOnly, async (req, res) => {
 
 // 🔹 Get orders of a customer (Admin)
 router.get("/customer/:customerId", protect, adminOnly, async (req, res) => {
-  const orders = await Order.find({ customer: req.params.customerId })
-    .populate("prescription");
-  res.json(orders);
+  try {
+    const orders = await Order.find({ customer: req.params.customerId })
+      .populate("prescription");
+    res.json(orders);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 export default router;
