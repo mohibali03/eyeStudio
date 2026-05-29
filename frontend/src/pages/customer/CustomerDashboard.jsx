@@ -14,7 +14,7 @@ const statusBadge = (s) => {
 };
 
 export default function CustomerDashboard() {
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("orders");
   const [orders, setOrders] = useState([]);
   const [prescription, setPrescription] = useState(null);
@@ -24,19 +24,19 @@ export default function CustomerDashboard() {
 
   // Fetch orders always (for stat cards too)
   useEffect(() => {
-    fetch(`${API_BASE_URL}/orders/my`, { headers: { Authorization: `Bearer ${token}` } })
+    fetch(`${API_BASE_URL}/orders/my`, { credentials: "include" })
       .then(r => r.json()).then(d => setOrders(Array.isArray(d) ? d : [])).catch(() => {});
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     if (activeTab === "prescription") {
       setPrescriptionError(false);
-      fetch(`${API_BASE_URL}/prescriptions/my`, { headers: { Authorization: `Bearer ${token}` }, credentials: "include" })
+      fetch(`${API_BASE_URL}/prescriptions/my`, { credentials: "include" })
         .then(r => { if (!r.ok) throw new Error(); return r.json(); })
         .then(d => setPrescription(Array.isArray(d) ? (d[0] || null) : d))
         .catch(() => setPrescriptionError(true));
     }
-  }, [activeTab, token]);
+  }, [activeTab]);
 
   const lastOrder = orders[0];
   const activePrescription = prescription ? "Available" : "—";

@@ -17,17 +17,26 @@ const storage = new CloudinaryStorage({
   cloudinary,
   params: { folder: "eyestudio", allowed_formats: ["jpg", "jpeg", "png", "webp"] },
 });
-const upload = multer({ storage });
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB per file
+});
 
-// Upload image
+// Upload single image
 router.post("/upload", protect, adminOnly, (req, res, next) => {
   upload.single("image")(req, res, (err) => {
-    if (err) {
-      console.error("Cloudinary upload error:", err);
-      return res.status(500).json({ message: "Image upload failed", error: err.message });
-    }
+    if (err) return res.status(500).json({ message: "Image upload failed", error: err.message });
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
     res.json({ imageUrl: req.file.path });
+  });
+});
+
+// Upload multiple images (max 6)
+router.post("/upload-multiple", protect, adminOnly, (req, res) => {
+  upload.array("images", 6)(req, res, (err) => {
+    if (err) return res.status(500).json({ message: "Upload failed", error: err.message });
+    if (!req.files?.length) return res.status(400).json({ message: "No files uploaded" });
+    res.json({ imageUrls: req.files.map((f) => f.path) });
   });
 });
 

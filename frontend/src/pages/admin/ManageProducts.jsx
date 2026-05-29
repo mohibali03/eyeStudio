@@ -2,14 +2,12 @@ import { useEffect, useState } from "react";
 import AdminLayout from "../../components/AdminLayout";
 import Toast from "../../components/Toast";
 import { API_BASE_URL } from "../../config/api";
-import { useAuth } from "../../context/AuthContext";
+import { X, Upload } from "lucide-react";
 import "../../styles/newDashboard.css";
 import "../../styles/admin.css";
 import "../../styles/managepage.css";
 
 const ManageProducts = () => {
-  const { token } = useAuth();
-
   const [products, setProducts] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -18,10 +16,14 @@ const ManageProducts = () => {
 
   const showToast = (message, type = "success") => setToast({ message, type });
   const [form, setForm] = useState({
-    name: "", price: "", category: "Men", frameType: "", description: "", imageUrl: "",
+    name: "", price: "", category: "Men", frameType: "", description: "", imageUrl: "", images: [],
   });
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState("");
+  const [imageFiles, setImageFiles] = useState([]);
+  const [previews, setPreviews]     = useState([]);
+
+  const MAX_FILES = 6;
+  const MAX_SIZE  = 5 * 1024 * 1024;
+  const ALLOWED   = ["image/jpeg", "image/png", "image/webp"];
 
   const fetchProducts = () => {
     fetch(`${API_BASE_URL}/products`)
@@ -34,45 +36,59 @@ const ManageProducts = () => {
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImageFile(file);
-      setImagePreview(URL.createObjectURL(file));
+  const handleImageSelect = (e) => {
+    const selected = Array.from(e.target.files);
+    const valid = [];
+    for (const f of selected) {
+      if (!ALLOWED.includes(f.type)) { showToast(`${f.name}: unsupported format`, "error"); continue; }
+      if (f.size > MAX_SIZE)         { showToast(`${f.name}: exceeds 5 MB`, "error"); continue; }
+      valid.push(f);
+    }
+    const combined = [...imageFiles, ...valid].slice(0, MAX_FILES);
+    setImageFiles(combined);
+    setPreviews(combined.map((f) => URL.createObjectURL(f)));
+    e.target.value = "";
+  };
+
+  const removePreview = (idx) => {
+    const files = imageFiles.filter((_, i) => i !== idx);
+    // if no new files left, keep existing URLs
+    if (files.length === 0 && form.images.length > 0) {
+      setPreviews(form.images);
+    } else {
+      setImageFiles(files);
+      setPreviews(files.map((f) => URL.createObjectURL(f)));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    let imageUrl = form.imageUrl;
+    let images = form.images || [];
 
-    if (imageFile) {
+    if (imageFiles.length > 0) {
       const fd = new FormData();
-      fd.append("image", imageFile);
-      const uploadRes = await fetch(`${API_BASE_URL}/products/upload`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: fd,
+      imageFiles.forEach((f) => fd.append("images", f));
+      const uploadRes = await fetch(`${API_BASE_URL}/products/upload-multiple`, {
+        method: "POST", credentials: "include", body: fd,
       });
       if (!uploadRes.ok) { showToast("Image upload failed", "error"); return; }
       const uploadData = await uploadRes.json();
-      imageUrl = uploadData.imageUrl;
+      images = uploadData.imageUrls;
     }
     const method = editingId ? "PUT" : "POST";
     const url = editingId ? `${API_BASE_URL}/products/${editingId}` : `${API_BASE_URL}/products`;
 
     const res = await fetch(url, {
       method,
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ ...form, imageUrl, price: Number(form.price) }),
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...form, imageUrl: images[0] || form.imageUrl || "", images, price: Number(form.price) }),
     });
 
     if (res.ok) {
-      setShowForm(false);
-      setEditingId(null);
-      setForm({ name: "", price: "", category: "Men", frameType: "", description: "", imageUrl: "" });
-      setImageFile(null);
-      setImagePreview("");
+      setShowForm(false); setEditingId(null);
+      setForm({ name: "", price: "", category: "Men", frameType: "", description: "", imageUrl: "", images: [] });
+      setImageFiles([]); setPreviews([]);
       fetchProducts();
       showToast(editingId ? "Product updated successfully" : "Product created successfully");
     } else {
@@ -83,34 +99,28 @@ const ManageProducts = () => {
   const handleEdit = (product) => {
     setEditingId(product._id);
     setForm({
-      name: product.name,
-      price: product.price,
-      category: product.category,
-      frameType: product.frameType || "",
-      description: product.description || "",
-      imageUrl: product.imageUrl || "",
+      name: product.name, price: product.price, category: product.category,
+      frameType: product.frameType || "", description: product.description || "",
+      imageUrl: product.imageUrl || "", images: product.images || [],
     });
-    setImageFile(null);
-    setImagePreview(product.imageUrl || "");
+    setImageFiles([]);
+    setPreviews(product.images?.length ? product.images : (product.imageUrl ? [product.imageUrl] : []));
     setShowForm(true);
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this product?")) return;
     const res = await fetch(`${API_BASE_URL}/products/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
+      method: "DELETE", credentials: "include",
     });
     if (res.ok) { fetchProducts(); showToast("Product deleted"); }
     else showToast("Failed to delete product", "error");
   };
 
   const handleCancel = () => {
-    setShowForm(false);
-    setEditingId(null);
-    setForm({ name: "", price: "", category: "Men", frameType: "", description: "", imageUrl: "" });
-    setImageFile(null);
-    setImagePreview("");
+    setShowForm(false); setEditingId(null);
+    setForm({ name: "", price: "", category: "Men", frameType: "", description: "", imageUrl: "", images: [] });
+    setImageFiles([]); setPreviews([]);
   };
 
   const filtered = products.filter((p) =>
@@ -160,10 +170,23 @@ const ManageProducts = () => {
                     <input name="frameType" value={form.frameType} onChange={handleChange} placeholder="e.g. Round, Square" />
                   </div>
                   <div className="form-field">
-                    <label>Product Image</label>
-                    <input type="file" accept="image/*" onChange={handleImageChange} />
-                    {imagePreview && (
-                      <img src={imagePreview.startsWith("blob") ? imagePreview : `http://localhost:5000${imagePreview}`} alt="preview" style={{ marginTop: 8, width: 100, height: 80, objectFit: "cover", borderRadius: 6 }} />
+                    <label>Product Images <span style={{fontWeight:400,fontSize:12,color:"var(--text-secondary)"}}>({previews.length}/{MAX_FILES})</span></label>
+                    <label style={{display:"flex",alignItems:"center",gap:8,padding:"8px 12px",border:"1.5px dashed var(--border)",borderRadius:6,cursor:imageFiles.length>=MAX_FILES?"not-allowed":"pointer",fontSize:13,color:"var(--text-secondary)",opacity:imageFiles.length>=MAX_FILES?0.5:1}}>
+                      <Upload size={14}/> Click to add images
+                      <input type="file" accept="image/*" multiple style={{display:"none"}} disabled={imageFiles.length>=MAX_FILES} onChange={handleImageSelect}/>
+                    </label>
+                    {previews.length > 0 && (
+                      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(72px,1fr))",gap:6,marginTop:8}}>
+                        {previews.map((src,i) => (
+                          <div key={i} style={{position:"relative"}}>
+                            <img src={src} alt={`img-${i}`} style={{width:"100%",aspectRatio:"1",objectFit:"cover",borderRadius:6,border:i===0?"2px solid var(--primary)":"1px solid var(--border)"}}/>
+                            {i===0 && <span style={{position:"absolute",top:2,left:2,background:"var(--primary)",color:"#fff",fontSize:9,padding:"1px 4px",borderRadius:3}}>Main</span>}
+                            <button type="button" onClick={()=>removePreview(i)} style={{position:"absolute",top:2,right:2,background:"#ef4444",border:"none",borderRadius:"50%",width:16,height:16,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",padding:0}}>
+                              <X size={9} color="#fff"/>
+                            </button>
+                          </div>
+                        ))}
+                      </div>
                     )}
                   </div>
                   <div className="form-field form-field-full">

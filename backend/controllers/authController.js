@@ -5,12 +5,12 @@ import jwt from "jsonwebtoken";
 const PW_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]).{8,20}$/;
 const PW_MESSAGE = "Password must be 8–20 characters and include uppercase, lowercase, number, and special character.";
 
-// Cookie options — SameSite=None + Secure required for cross-origin (Render)
+// Cookie options — production-hardened
 const cookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
   sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-  maxAge: 7 * 24 * 60 * 60 * 1000,   // 7 days
+  maxAge: 24 * 60 * 60 * 1000,   // 1 day
 };
 
 export const registerUser = async (req, res) => {
@@ -63,19 +63,16 @@ export const loginUser = async (req, res) => {
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: "7d" }
+      { expiresIn: "1d" }
     );
 
-    // Store session data
     req.session.userId = user._id.toString();
     req.session.role   = user.role;
 
-    // Set JWT in HTTP-only cookie
     res.cookie("token", token, cookieOptions);
 
-    // Also return token in body so existing frontend localStorage flow keeps working
+    // Return user data only — token travels via HTTP-only cookie
     res.json({
-      token,
       user: {
         id:    user._id,
         name:  user.name,

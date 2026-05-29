@@ -72,7 +72,7 @@ const statusBadge = (s) => {
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
-  const { user, logout, token } = useAuth();
+  const { user, logout } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [stats, setStats] = useState(null);
@@ -80,20 +80,15 @@ export default function AdminDashboard() {
   const [customers, setCustomers] = useState([]);
 
   useEffect(() => {
-    const h = { Authorization: `Bearer ${token}` };
-    fetch(`${API_BASE_URL}/orders/stats`, { headers: h })
+    fetch(`${API_BASE_URL}/orders/stats`, { credentials: "include" })
+      .then((r) => r.json()).then(setStats).catch(() => {});
+    fetch(`${API_BASE_URL}/orders`, { credentials: "include" })
       .then((r) => r.json())
-      .then(setStats)
-      .catch(() => {});
-    fetch(`${API_BASE_URL}/orders`, { headers: h })
+      .then((d) => setOrders(Array.isArray(d) ? d.slice(0, 5) : [])).catch(() => {});
+    fetch(`${API_BASE_URL}/users?limit=5`, { credentials: "include" })
       .then((r) => r.json())
-      .then((d) => setOrders(Array.isArray(d) ? d.slice(0, 5) : []))
-      .catch(() => {});
-    fetch(`${API_BASE_URL}/users`, { headers: h })
-      .then((r) => r.json())
-      .then((d) => setCustomers(Array.isArray(d) ? d.slice(0, 5) : []))
-      .catch(() => {});
-  }, [token]);
+      .then((d) => setCustomers(Array.isArray(d.customers) ? d.customers : [])).catch(() => {});
+  }, []);
 
   const pieData = stats
     ? [

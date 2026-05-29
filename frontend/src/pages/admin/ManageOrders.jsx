@@ -5,7 +5,6 @@ import {
   Clock, CheckCircle, XCircle, Loader, Filter,
   User, Package, FileText, Calendar,
 } from "lucide-react";
-import { useAuth } from "../../context/AuthContext";
 import { API_BASE_URL } from "../../config/api";
 import AdminLayout from "../../components/AdminLayout";
 import Toast from "../../components/Toast";
@@ -30,7 +29,6 @@ const StatusBadge = ({ status }) => {
 };
 
 export default function ManageOrders() {
-  const { token } = useAuth();
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -38,27 +36,26 @@ export default function ManageOrders() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("");
-  const [selected, setSelected] = useState(null); // modal order
+  const [selected, setSelected] = useState(null);
   const [updatingId, setUpdatingId] = useState(null);
-
-  const headers = { Authorization: `Bearer ${token}` };
 
   const fetchOrders = () => {
     setLoading(true);
-    fetch(`${API_BASE_URL}/orders/all`, { headers })
+    fetch(`${API_BASE_URL}/orders/all`, { credentials: "include" })
       .then(r => r.json())
       .then(d => { setOrders(Array.isArray(d) ? d : []); setLoading(false); })
       .catch(() => { setLoading(false); });
   };
 
-  useEffect(() => { fetchOrders(); }, [token]);
+  useEffect(() => { fetchOrders(); }, []);
 
   const updateStatus = async (orderId, status) => {
     setUpdatingId(orderId);
     try {
       const res = await fetch(`${API_BASE_URL}/orders/${orderId}/status`, {
         method: "PUT",
-        headers: { ...headers, "Content-Type": "application/json" },
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });
       const data = await res.json();

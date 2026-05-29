@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import Header from "../../components/Header";
 import { API_BASE_URL } from "../../config/api";
-import { useAuth } from "../../context/AuthContext";
 import { ShoppingBag } from "lucide-react";
 import "../../styles/newDashboard.css";
 
@@ -11,17 +10,14 @@ const statusBadge = (s) => {
 };
 
 export default function CustomerOrders() {
-  const { token } = useAuth();
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/orders/my`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    fetch(`${API_BASE_URL}/orders/my`, { credentials: "include" })
       .then((r) => r.json())
       .then((d) => setOrders(Array.isArray(d) ? d : []))
       .catch(() => {});
-  }, [token]);
+  }, []);
 
   return (
     <div className="cd-root">

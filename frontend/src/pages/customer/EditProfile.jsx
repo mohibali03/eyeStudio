@@ -9,18 +9,16 @@ import "../../styles/newDashboard.css";
 import "../../styles/auth.css";
 
 export default function EditProfile() {
-  const { token, login, user } = useAuth();
+  const { user, login } = useAuth();
   const [form, setForm] = useState({ name: "", email: "", phone: "", password: "" });
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/users/profile`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    fetch(`${API_BASE_URL}/users/profile`, { credentials: "include" })
       .then((r) => r.json())
       .then((d) => setForm({ name: d.name, email: d.email, phone: d.phone || "", password: "" }))
       .catch(() => setToast({ message: "Failed to load profile", type: "error" }));
-  }, [token]);
+  }, []);
 
   const [showPw, setShowPw]     = useState(false);
   const [pwTouched, setPwTouched] = useState(false);
@@ -41,12 +39,13 @@ export default function EditProfile() {
 
     const res = await fetch(`${API_BASE_URL}/users/profile`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
     const data = await res.json();
     if (res.ok) {
-      login({ ...user, name: data.name, email: data.email, phone: data.phone }, token);
+      login({ ...user, name: data.name, email: data.email, phone: data.phone });
       setForm((f) => ({ ...f, password: "" }));
       setToast({ message: "Profile updated successfully", type: "success" });
     } else {

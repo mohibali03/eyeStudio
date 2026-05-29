@@ -12,11 +12,35 @@ const PW_MESSAGE = "Password must be 8–20 characters and include uppercase, lo
 const PHONE_REGEX = /^[0-9]{10}$/;
 const PHONE_MESSAGE = "Phone number must be exactly 10 digits.";
 
-// GET ALL CUSTOMERS (ADMIN ONLY)
+// GET ALL CUSTOMERS (ADMIN ONLY) — with server-side pagination
 router.get("/", protect, adminOnly, async (req, res) => {
   try {
-    const users = await User.find({ role: "customer" }).select("-password");
-    res.json(users);
+    const page     = Math.max(1, parseInt(req.query.page)  || 1);
+    const limit    = Math.min(50, Math.max(1, parseInt(req.query.limit) || 10));
+    const skip     = (page - 1) * limit;
+    const search   = req.query.search || "";
+
+    const filter = { role: "customer" };
+    if (search) {
+      filter.$or = [
+        { name:  { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+        { phone: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    const [users, totalCount] = await Promise.all([
+      User.find(filter).select("-password").sort({ createdAt: -1 }).skip(skip).limit(limit),
+      User.countDocuments(filter),
+    ]);
+
+    res.json({
+      customers:   users,
+      totalCount,
+      totalPages:  Math.ceil(totalCount / limit),
+      currentPage: page,
+      pageSize:    limit,
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import AdminLayout from "../../components/AdminLayout";
 import Toast from "../../components/Toast";
 import { API_BASE_URL } from "../../config/api";
-import { useAuth } from "../../context/AuthContext";
 import { UserCircle, Eye, EyeOff } from "lucide-react";
 import { PASSWORD_RULES, validatePassword, passwordStrength } from "../../utils/passwordValidator";
 import "../../styles/newDashboard.css";
@@ -10,17 +9,16 @@ import "../../styles/managepage.css";
 import "../../styles/auth.css";
 
 export default function AdminProfile() {
-  const { token } = useAuth();
   const [profile, setProfile] = useState(null);
   const [form, setForm] = useState({ name: "", password: "" });
   const [toast, setToast] = useState(null);
   const showToast = (msg, type = "success") => setToast({ message: msg, type });
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/users/profile`, { headers: { Authorization: `Bearer ${token}` } })
+    fetch(`${API_BASE_URL}/users/profile`, { credentials: "include" })
       .then(r => r.json())
       .then(d => { setProfile(d); setForm({ name: d.name, password: "" }); });
-  }, [token]);
+  }, []);
 
   const [showPw, setShowPw]       = useState(false);
   const [pwTouched, setPwTouched]  = useState(false);
@@ -36,7 +34,8 @@ export default function AdminProfile() {
     if (form.password) body.password = form.password;
     const res = await fetch(`${API_BASE_URL}/users/profile`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
     const data = await res.json();

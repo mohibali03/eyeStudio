@@ -26,7 +26,6 @@
 }
 .product-details-image img { width: 100%; height: 100%; object-fit: cover; }
 .placeholder-large { color: var(--text-muted); }
-
 .product-details-info {
   padding: 48px 44px;
   display: flex;
@@ -113,7 +112,78 @@
   color: var(--text-secondary);
 }
 
-@media (max-width: 768px) {
+/* ── Gallery ─────────────────────────────────────────────────────────────── */
+.gallery-root {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-alt);
+  overflow: hidden;
+}
+
+.gallery-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 380px;
+  overflow: hidden;
+  background: var(--bg-alt);
+}
+
+.gallery-main-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: fadeIn .25s ease;
+}
+
+@keyframes fadeIn { from { opacity: 0; transform: scale(1.02); } to { opacity: 1; transform: scale(1); } }
+
+.gallery-thumbs {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px;
+  overflow-x: auto;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  scrollbar-width: thin;
+}
+
+.gallery-thumb {
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  overflow: hidden;
+  cursor: pointer;
+  padding: 0;
+  background: none;
+  transition: border-color .15s, transform .15s;
+}
+
+.gallery-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.gallery-thumb:hover { border-color: var(--primary); transform: translateY(-2px); }
+.gallery-thumb-active { border-color: var(--primary) !important; box-shadow: 0 0 0 2px var(--primary-light); }
+
+/* ── Share button ─────────────────────────────────────────────────────────── */
+.share-btn {
+  flex: 1;
+  padding: 13px 24px;
+  background: var(--bg-alt);
+  color: var(--text);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: center;
+}
+.share-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+
   .product-details-wrapper { grid-template-columns: 1fr; }
   .product-details-image { min-height: 260px; }
   .product-details-info { padding: 24px 20px; }

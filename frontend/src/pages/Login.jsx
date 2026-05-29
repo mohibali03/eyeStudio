@@ -27,7 +27,7 @@ const Login = () => {
       });
       const data = await res.json();
       if (!res.ok) { setError(data.message || "Login failed"); return; }
-      login(data.user, data.token);
+      login(data.user);
       navigate(data.user.role === "admin" ? "/admin" : "/dashboard");
     } catch {
       setError("Server error. Please try again.");

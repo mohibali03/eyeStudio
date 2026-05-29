@@ -119,7 +119,6 @@ function ProductSearch({ products, value, onSelect }) {
 const CreateOrder = () => {
   const { customerId } = useParams();
   const navigate       = useNavigate();
-  const { token }      = useAuth();
 
   const [customer,  setCustomer]  = useState(null);
   const [products,  setProducts]  = useState([]);
@@ -135,17 +134,15 @@ const CreateOrder = () => {
 
   /* Fetch customer name */
   useEffect(() => {
-    fetch(`${API_BASE_URL}/users/profile`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    fetch(`${API_BASE_URL}/users/profile`, { credentials: "include" })
       .then((r) => r.json())
       .catch(() => {});
 
-    /* Fetch the specific customer by listing all and finding by id */
-    fetch(`${API_BASE_URL}/users`, { headers: { Authorization: `Bearer ${token}` } })
+    fetch(`${API_BASE_URL}/users?limit=200`, { credentials: "include" })
       .then((r) => r.json())
-      .then((list) => {
-        const found = Array.isArray(list) ? list.find((u) => u._id === customerId) : null;
+      .then((data) => {
+        const list = data.customers || [];
+        const found = list.find((u) => u._id === customerId);
         setCustomer(found || null);
       })
       .catch(() => {});
@@ -178,7 +175,8 @@ const CreateOrder = () => {
     }
     const res = await fetch(`${API_BASE_URL}/orders/${customerId}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         items: [{
           productName: selected.name,

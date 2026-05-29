@@ -3,24 +3,20 @@ import { useNavigate } from "react-router-dom";
 import Header from "../../components/Header";
 import Toast from "../../components/Toast";
 import { API_BASE_URL } from "../../config/api";
-import { useAuth } from "../../context/AuthContext";
 import { UserCircle, PenLine } from "lucide-react";
 import "../../styles/newDashboard.css";
 
 export default function CustomerProfile() {
-  const { token } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/users/profile`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    fetch(`${API_BASE_URL}/users/profile`, { credentials: "include" })
       .then((r) => r.json())
       .then(setProfile)
       .catch(() => setToast({ message: "Failed to load profile", type: "error" }));
-  }, [token]);
+  }, []);
 
   return (
     <div className="cd-root">

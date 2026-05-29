@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import AdminLayout from "../../components/AdminLayout";
 import Toast from "../../components/Toast";
 import { API_BASE_URL } from "../../config/api";
-import { useAuth } from "../../context/AuthContext";
 import { CalendarCheck } from "lucide-react";
 import "../../styles/newDashboard.css";
 import "../../styles/admin.css";
@@ -10,19 +9,19 @@ import "../../styles/admin.css";
 const EyeTestBookings = () => {
   const [bookings, setBookings] = useState([]);
   const [toast, setToast] = useState(null);
-  const { token } = useAuth();
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/eye-tests`, { headers: { Authorization: `Bearer ${token}` } })
+    fetch(`${API_BASE_URL}/eye-tests`, { credentials: "include" })
       .then(r => r.json())
       .then(setBookings)
       .catch(() => setToast({ message: "Failed to load bookings", type: "error" }));
-  }, [token]);
+  }, []);
 
   const updateStatus = async (id, status) => {
     const res = await fetch(`${API_BASE_URL}/eye-tests/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),
     });
     if (res.ok) {
