@@ -16,6 +16,12 @@ import eyeTestRoutes from "./routes/eyeTestRoutes.js";
 
 dotenv.config();
 
+// ── Startup env validation ────────────────────────────────────────────────────
+if (!process.env.JWT_SECRET)  console.error("[FATAL] JWT_SECRET is not set");
+if (!process.env.MONGO_URI)   console.error("[FATAL] MONGO_URI is not set");
+if (!process.env.CLIENT_URL)  console.warn("[WARN]  CLIENT_URL is not set — CORS will only allow localhost:5173");
+if (!process.env.NODE_ENV)    console.warn("[WARN]  NODE_ENV is not set — cookies will use insecure settings");
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -24,11 +30,17 @@ const app = express();
 // ── CORS ─────────────────────────────────────────────────────────────────────
 const allowedOrigins = process.env.CLIENT_URL
   ? process.env.CLIENT_URL.split(",").map((u) => u.trim())
-  : ["http://localhost:5173"];
+  : ["http://localhost:5173", "http://localhost:3000"];
 
 app.use(cors({
-  origin: allowedOrigins,
-  credentials: true,           // required for cookies to be sent cross-origin
+  origin: (origin, callback) => {
+    // Allow requests with no origin (same-origin, Postman, mobile apps)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    console.warn(`CORS blocked origin: ${origin} | Allowed: ${allowedOrigins.join(", ")}`);
+    return callback(new Error(`CORS: origin ${origin} not allowed`));
+  },
+  credentials: true,
 }));
 
 // ── Core middleware ───────────────────────────────────────────────────────────
@@ -65,10 +77,15 @@ app.use("/api/eye-tests", eyeTestRoutes);
 app.get("/", (req, res) => res.send("eyeStudio backend is running"));
 app.get("/api/health", (req, res) => {
   res.json({
-    status: "ok",
-    mongo: process.env.MONGO_URI ? "set" : "MISSING",
-    jwt:   process.env.JWT_SECRET ? "set" : "MISSING",
-    cors:  allowedOrigins,
+    status:         "ok",
+    nodeEnv:        process.env.NODE_ENV        || "NOT SET ⚠️",
+    mongo:          process.env.MONGO_URI       ? "set ✅" : "MISSING ❌",
+    jwt:            process.env.JWT_SECRET      ? "set ✅" : "MISSING ❌",
+    sessionSecret:  process.env.SESSION_SECRET  ? "set ✅" : "using JWT_SECRET fallback ⚠️",
+    clientUrl:      process.env.CLIENT_URL      || "NOT SET ⚠️ — defaulting to localhost:5173",
+    allowedOrigins,
+    requestOrigin:  req.headers.origin          || "(no origin header — same-origin or Postman)",
+    cookieReceived: req.cookies?.token          ? "yes ✅" : "no ❌",
   });
 });
 

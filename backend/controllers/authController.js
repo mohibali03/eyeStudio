@@ -5,12 +5,16 @@ import jwt from "jsonwebtoken";
 const PW_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]).{8,20}$/;
 const PW_MESSAGE = "Password must be 8–20 characters and include uppercase, lowercase, number, and special character.";
 
-// Cookie options — production-hardened
+// Cookie options
+// On Render: frontend (eyestudio-6trk.onrender.com) and backend are cross-origin
+// so we ALWAYS need sameSite:"none" + secure:true in production.
+// sameSite:"lax" only works for same-origin (same domain).
+const isProduction = process.env.NODE_ENV === "production";
 const cookieOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-  maxAge: 24 * 60 * 60 * 1000,   // 1 day
+  secure:   isProduction,                    // must be true for sameSite:none
+  sameSite: isProduction ? "none" : "lax",   // none = cross-origin cookies allowed
+  maxAge:   7 * 24 * 60 * 60 * 1000,        // 7 days
 };
 
 export const registerUser = async (req, res) => {
@@ -70,6 +74,7 @@ export const loginUser = async (req, res) => {
     req.session.role   = user.role;
 
     res.cookie("token", token, cookieOptions);
+    console.log(`[AUTH] Login OK: ${user.email} | role: ${user.role} | env: ${process.env.NODE_ENV} | cookie secure: ${cookieOptions.secure} | sameSite: ${cookieOptions.sameSite}`);
 
     // Return user data only — token travels via HTTP-only cookie
     res.json({
