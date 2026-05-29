@@ -1,27 +1,38 @@
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import { API_BASE_URL } from "../config/api";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser]       = useState(null);
-  const [loading, setLoading] = useState(true); // true until session verified
+  const [loading, setLoading] = useState(true);
+  // Tracks whether login() was called before /auth/me resolved,
+  // so a stale null response doesn't overwrite the freshly-set user.
+  const loginCalledRef = useRef(false);
 
-  // On mount: verify the HTTP-only cookie with the server
   useEffect(() => {
     fetch(`${API_BASE_URL}/auth/me`, { credentials: "include" })
       .then((r) => (r.ok ? r.json() : null))
-      .then((data) => setUser(data?.user || null))
-      .catch(() => setUser(null))
+      .then((data) => {
+        // Only set user from /auth/me if login() hasn't already set it
+        if (!loginCalledRef.current) {
+          setUser(data?.user || null);
+        }
+      })
+      .catch(() => {
+        if (!loginCalledRef.current) setUser(null);
+      })
       .finally(() => setLoading(false));
   }, []);
 
   const login = useCallback((userData) => {
-    // Token arrives only as HTTP-only cookie — we just store the user object
+    loginCalledRef.current = true;
     setUser(userData);
+    setLoading(false); // immediately unblock routes after login
   }, []);
 
   const logout = useCallback(async () => {
+    loginCalledRef.current = false;
     try {
       await fetch(`${API_BASE_URL}/auth/logout`, {
         method: "POST",

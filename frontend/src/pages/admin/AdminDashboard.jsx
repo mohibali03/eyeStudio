@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, Component } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -36,6 +36,22 @@ import ProfileMenu from "../../components/ProfileMenu";
 import "../../styles/newDashboard.css";
 import "../../styles/manageOrders.css";
 
+// Error boundary — catches any render crash and shows fallback instead of blank screen
+class DashboardErrorBoundary extends Component {
+  state = { hasError: false, error: null };
+  static getDerivedStateFromError(error) { return { hasError: true, error }; }
+  render() {
+    if (this.state.hasError) return (
+      <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12, color: "#64748b", padding: 24 }}>
+        <p style={{ fontSize: 18, fontWeight: 700, color: "#ef4444" }}>Dashboard failed to load</p>
+        <p style={{ fontSize: 13 }}>{this.state.error?.message || "An unexpected error occurred."}</p>
+        <button onClick={() => window.location.reload()} style={{ padding: "8px 20px", background: "#2563eb", color: "#fff", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 14 }}>Reload Page</button>
+      </div>
+    );
+    return this.props.children;
+  }
+}
+
 const PIE_COLORS = ["#f59e0b", "#10b981", "#ef4444"];
 
 const NavItem = ({ icon: Icon, label, active, onClick, collapsed }) => (
@@ -71,6 +87,14 @@ const statusBadge = (s) => {
 };
 
 export default function AdminDashboard() {
+  return (
+    <DashboardErrorBoundary>
+      <AdminDashboardInner />
+    </DashboardErrorBoundary>
+  );
+}
+
+function AdminDashboardInner() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
@@ -228,7 +252,7 @@ export default function AdminDashboard() {
             <StatCard
               icon={IndianRupee}
               label="Total Sales"
-              value={stats ? `₹${stats.totalSales.toLocaleString()}` : null}
+              value={stats ? `₹${(stats.totalSales ?? 0).toLocaleString()}` : null}
               color="#10b981"
             />
             <StatCard
