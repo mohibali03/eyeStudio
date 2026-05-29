@@ -12,7 +12,7 @@ const MAX_FILES = 6;
 const MAX_SIZE  = 5 * 1024 * 1024;
 const ALLOWED   = ["image/jpeg", "image/png", "image/webp"];
 
-// ── Multi-select chip picker ──────────────────────────────────────────────────
+/* ── Reusable chip pickers ───────────────────────────────────────────────── */
 const ChipPicker = ({ label, options, selected, onChange }) => (
   <div className="form-field">
     <label>{label}</label>
@@ -20,9 +20,7 @@ const ChipPicker = ({ label, options, selected, onChange }) => (
       {options.map(opt => {
         const active = selected.includes(opt);
         return (
-          <button
-            key={opt}
-            type="button"
+          <button key={opt} type="button"
             className={`form-chip${active ? " active" : ""}`}
             onClick={() => onChange(active ? selected.filter(v => v !== opt) : [...selected, opt])}
           >
@@ -34,15 +32,12 @@ const ChipPicker = ({ label, options, selected, onChange }) => (
   </div>
 );
 
-// ── Single-select chip picker ─────────────────────────────────────────────────
 const SingleChipPicker = ({ label, options, value, onChange }) => (
   <div className="form-field">
     <label>{label}</label>
     <div className="chip-picker">
       {options.map(opt => (
-        <button
-          key={opt}
-          type="button"
+        <button key={opt} type="button"
           className={`form-chip${value === opt ? " active" : ""}`}
           onClick={() => onChange(value === opt ? "" : opt)}
         >
@@ -53,29 +48,26 @@ const SingleChipPicker = ({ label, options, value, onChange }) => (
   </div>
 );
 
-const TRUST_BADGE_OPTIONS = [
-  "Free Shipping", "1 Year Warranty", "Easy Return",
-  "COD Available", "Premium Quality", "UV Protection",
-  "Anti-Glare", "Blue Light Block", "Scratch Resistant",
-];
-
-const FRAME_SHAPES  = ["Round", "Square", "Rectangle", "Cat Eye", "Aviator", "Wayfarer", "Geometric", "Oval", "Hexagonal"];
-const FRAME_COLORS  = ["Black", "Blue", "Brown", "Silver", "Gold", "Transparent", "Red", "Green", "Pink", "White"];
-const MATERIALS     = ["Metal", "Plastic", "Titanium", "Acetate", "TR90", "Wood"];
-const FACE_SHAPES   = ["Oval", "Round", "Square", "Heart", "Diamond", "Oblong"];
-const OCCASIONS     = ["Casual", "Office", "Party", "Sports", "Travel"];
-const CLOTHES       = ["Formal", "Casual", "Ethnic", "Streetwear", "Sporty"];
-const LOOKS         = ["Professional", "Trendy", "Minimal", "Luxury", "Sporty"];
-const VIBES         = ["Classic", "Cool", "Bold", "Elegant", "Quirky"];
-const COUNTRIES     = ["India", "USA", "Japan", "Italy", "China", "Germany"];
+/* ── Option lists (must match Products.jsx filter options exactly) ────────── */
+const FRAME_SHAPES     = ["Round","Square","Rectangle","Cat Eye","Aviator","Wayfarer","Geometric","Oval","Hexagonal"];
+const FRAME_COLORS     = ["Black","Blue","Brown","Silver","Gold","Transparent","Red","Green","Pink","White"];
+const MATERIALS        = ["Metal","Plastic","Titanium","Acetate","TR90","Wood"];
+const FACE_SHAPES      = ["Oval","Round","Square","Heart","Diamond","Oblong"];
+const OCCASIONS        = ["Casual","Office","Party","Sports","Travel"];
+const CLOTHES          = ["Formal","Casual","Ethnic","Streetwear","Sporty"];
+const LOOKS            = ["Professional","Trendy","Minimal","Luxury","Sporty"];
+const VIBES            = ["Classic","Cool","Bold","Elegant","Quirky"];
+const COUNTRIES        = ["India","USA","Japan","Italy","China","Germany"];
+const TRUST_BADGE_OPTS = ["Free Shipping","1 Year Warranty","Easy Return","COD Available","Premium Quality","UV Protection","Anti-Glare","Blue Light Block","Scratch Resistant"];
 
 const EMPTY = {
-  name: "", price: "", category: "Men", brand: "",
-  frameType: "", frameShape: "", frameSize: "", frameColor: [],
-  material: "", weight: "", faceShape: [], occasion: [],
-  clothesMatcher: [], looksFinder: [], vibeCheck: [],
-  countryOfOrigin: "", computerGlasses: false,
-  description: "", trustBadges: [],
+  name:"", price:"", category:"Men", brand:"",
+  frameType:"", frameShape:"", frameSize:"",
+  frameColor:[], material:"", weight:"",
+  faceShape:[], occasion:[], clothesMatcher:[],
+  looksFinder:[], vibeCheck:[],
+  countryOfOrigin:"", computerGlasses:false,
+  description:"", trustBadges:[],
 };
 
 const CreateProduct = () => {
@@ -86,6 +78,7 @@ const CreateProduct = () => {
   const [toast, setToast]           = useState(null);
   const [saving, setSaving]         = useState(false);
 
+  /* controlled field helpers */
   const set = (key, val) => setProduct(p => ({ ...p, [key]: val }));
   const handleChange = e => set(e.target.name, e.target.type === "checkbox" ? e.target.checked : e.target.value);
 
@@ -118,26 +111,26 @@ const CreateProduct = () => {
       try {
         const fd = new FormData();
         imageFiles.forEach(f => fd.append("images", f));
-        const up = await authFetch(`${API_BASE_URL}/products/upload-multiple`, { method: "POST", body: fd });
+        const up = await authFetch(`${API_BASE_URL}/products/upload-multiple`, { method:"POST", body:fd });
         const upData = await up.json();
-        if (!up.ok) { setToast({ message: upData.message || "Upload failed", type: "error" }); setSaving(false); return; }
+        if (!up.ok) { setToast({ message: upData.message || "Upload failed", type:"error" }); setSaving(false); return; }
         images = upData.imageUrls;
       } catch {
-        setToast({ message: "Image upload failed: network error", type: "error" }); setSaving(false); return;
+        setToast({ message:"Image upload failed: network error", type:"error" }); setSaving(false); return;
       }
     }
 
     const res = await authFetch(`${API_BASE_URL}/products`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...product, imageUrl: images[0] || "", images, price: Number(product.price) }),
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({ ...product, imageUrl: images[0]||"", images, price: Number(product.price) }),
     });
 
     if (res.ok) {
-      setToast({ message: "Product created successfully", type: "success" });
+      setToast({ message:"Product created successfully", type:"success" });
       setTimeout(() => navigate("/admin/manage-products"), 1500);
     } else {
-      setToast({ message: "Failed to create product", type: "error" });
+      setToast({ message:"Failed to create product", type:"error" });
     }
     setSaving(false);
   };
@@ -155,90 +148,95 @@ const CreateProduct = () => {
       <div className="ds-content">
         <form onSubmit={handleSubmit} className="cp-form">
 
-          {/* ── Section: Basic Info ── */}
+          {/* ── 1. Basic Information ── */}
           <div className="cp-section">
             <div className="cp-section-title"><Package size={15} /> Basic Information</div>
             <div className="cp-grid-2">
               <div className="form-field cp-span-2">
                 <label>Product Name *</label>
-                <input name="name" placeholder="e.g. Ray-Ban Aviator Classic" onChange={handleChange} required />
+                <input name="name" value={product.name} placeholder="e.g. Ray-Ban Aviator Classic" onChange={handleChange} required />
               </div>
               <div className="form-field">
                 <label>Price (₹) *</label>
-                <input name="price" type="number" min="0" placeholder="0" onChange={handleChange} required />
+                <input name="price" type="number" min="0" value={product.price} placeholder="0" onChange={handleChange} required />
               </div>
               <div className="form-field">
                 <label>Brand</label>
-                <input name="brand" placeholder="e.g. Ray-Ban, Lenskart" onChange={handleChange} />
+                <input name="brand" value={product.brand} placeholder="e.g. Ray-Ban, Lenskart" onChange={handleChange} />
               </div>
               <div className="form-field">
-                <label>Category *</label>
-                <select name="category" onChange={handleChange}>
-                  {["Men", "Women", "Kids", "Unisex"].map(c => <option key={c}>{c}</option>)}
+                <label>Category (Gender) *</label>
+                <select name="category" value={product.category} onChange={handleChange}>
+                  {["Men","Women","Kids","Unisex"].map(c => <option key={c}>{c}</option>)}
                 </select>
               </div>
               <div className="form-field">
                 <label>Country of Origin</label>
-                <select name="countryOfOrigin" onChange={handleChange}>
+                <select name="countryOfOrigin" value={product.countryOfOrigin} onChange={handleChange}>
                   <option value="">— Select —</option>
                   {COUNTRIES.map(c => <option key={c}>{c}</option>)}
                 </select>
               </div>
               <div className="form-field cp-span-2">
                 <label>Description</label>
-                <textarea name="description" placeholder="Describe the product…" onChange={handleChange} rows={3} />
+                <textarea name="description" value={product.description} placeholder="Describe the product…" onChange={handleChange} rows={3} />
               </div>
             </div>
           </div>
 
-          {/* ── Section: Frame Details ── */}
+          {/* ── 2. Frame Details ── */}
           <div className="cp-section">
             <div className="cp-section-title"><Tag size={15} /> Frame Details</div>
             <div className="cp-grid-2">
-              <SingleChipPicker label="Frame Type"  options={["Full Rim", "Half Rim", "Rimless"]}    value={product.frameType}  onChange={v => set("frameType", v)} />
-              <SingleChipPicker label="Frame Shape" options={FRAME_SHAPES}                            value={product.frameShape} onChange={v => set("frameShape", v)} />
-              <SingleChipPicker label="Frame Size"  options={["Small", "Medium", "Large"]}            value={product.frameSize}  onChange={v => set("frameSize", v)} />
-              <SingleChipPicker label="Material"    options={MATERIALS}                               value={product.material}   onChange={v => set("material", v)} />
-              <SingleChipPicker label="Weight"      options={["Lightweight", "Medium", "Heavy"]}      value={product.weight}     onChange={v => set("weight", v)} />
-              <ChipPicker       label="Frame Color" options={FRAME_COLORS}                            selected={product.frameColor} onChange={v => set("frameColor", v)} />
+              <SingleChipPicker label="Frame Type"  options={["Full Rim","Half Rim","Rimless"]}  value={product.frameType}  onChange={v => set("frameType", v)} />
+              <SingleChipPicker label="Frame Shape" options={FRAME_SHAPES}                       value={product.frameShape} onChange={v => set("frameShape", v)} />
+              <SingleChipPicker label="Frame Size"  options={["Small","Medium","Large"]}         value={product.frameSize}  onChange={v => set("frameSize", v)} />
+              <SingleChipPicker label="Material"    options={MATERIALS}                          value={product.material}   onChange={v => set("material", v)} />
+              <SingleChipPicker label="Weight"      options={["Lightweight","Medium","Heavy"]}   value={product.weight}     onChange={v => set("weight", v)} />
+              <ChipPicker       label="Frame Color (select all that apply)" options={FRAME_COLORS} selected={product.frameColor} onChange={v => set("frameColor", v)} />
             </div>
           </div>
 
-          {/* ── Section: Style & Fit ── */}
+          {/* ── 3. Style & Fit ── */}
           <div className="cp-section">
             <div className="cp-section-title">✨ Style & Fit</div>
             <div className="cp-grid-2">
-              <ChipPicker label="Best for Face Shape" options={FACE_SHAPES} selected={product.faceShape}      onChange={v => set("faceShape", v)} />
-              <ChipPicker label="Occasion"            options={OCCASIONS}   selected={product.occasion}       onChange={v => set("occasion", v)} />
-              <ChipPicker label="Clothes Matcher"     options={CLOTHES}     selected={product.clothesMatcher} onChange={v => set("clothesMatcher", v)} />
-              <ChipPicker label="Looks Finder"        options={LOOKS}       selected={product.looksFinder}    onChange={v => set("looksFinder", v)} />
-              <ChipPicker label="Vibe Check"          options={VIBES}       selected={product.vibeCheck}      onChange={v => set("vibeCheck", v)} />
+              <ChipPicker label="Best for Face Shape"  options={FACE_SHAPES} selected={product.faceShape}      onChange={v => set("faceShape", v)} />
+              <ChipPicker label="Occasion"             options={OCCASIONS}   selected={product.occasion}       onChange={v => set("occasion", v)} />
+              <ChipPicker label="Clothes Matcher"      options={CLOTHES}     selected={product.clothesMatcher} onChange={v => set("clothesMatcher", v)} />
+              <ChipPicker label="Looks Finder"         options={LOOKS}       selected={product.looksFinder}    onChange={v => set("looksFinder", v)} />
+              <ChipPicker label="Vibe Check"           options={VIBES}       selected={product.vibeCheck}      onChange={v => set("vibeCheck", v)} />
               <div className="form-field">
                 <label>Computer / Blue Light Glasses</label>
                 <label className="toggle-label">
                   <input type="checkbox" name="computerGlasses" checked={product.computerGlasses} onChange={handleChange} />
                   <span className="toggle-track"><span className="toggle-thumb" /></span>
-                  <span>{product.computerGlasses ? "Yes" : "No"}</span>
+                  <span>{product.computerGlasses ? "Yes — Blue Light Filter" : "No"}</span>
                 </label>
               </div>
             </div>
           </div>
 
-          {/* ── Section: Trust Badges ── */}
+          {/* ── 4. Trust Badges ── */}
           <div className="cp-section">
             <div className="cp-section-title">🛡️ Trust Badges</div>
-            <ChipPicker label="Select badges to display on product page" options={TRUST_BADGE_OPTIONS} selected={product.trustBadges} onChange={v => set("trustBadges", v)} />
+            <ChipPicker label="Select badges shown on the product page" options={TRUST_BADGE_OPTS} selected={product.trustBadges} onChange={v => set("trustBadges", v)} />
           </div>
 
-          {/* ── Section: Images ── */}
+          {/* ── 5. Product Images ── */}
           <div className="cp-section">
             <div className="cp-section-title"><Upload size={15} /> Product Images</div>
             <div className="form-field">
-              <label>Upload Images <span style={{ fontWeight: 400, color: "var(--text-secondary)" }}>(up to {MAX_FILES}, max 5 MB each)</span></label>
+              <label>
+                Upload Images
+                <span style={{ fontWeight:400, color:"var(--text-secondary)", marginLeft:6 }}>
+                  (up to {MAX_FILES}, max 5 MB each — first image is the main display image)
+                </span>
+              </label>
               <label className={`upload-zone${imageFiles.length >= MAX_FILES ? " disabled" : ""}`}>
                 <Upload size={20} />
                 <span>{imageFiles.length === 0 ? "Click to upload images" : `${imageFiles.length} selected — click to add more`}</span>
-                <input type="file" accept="image/*" multiple style={{ display: "none" }} disabled={imageFiles.length >= MAX_FILES} onChange={handleFileSelect} />
+                <input type="file" accept="image/*" multiple style={{ display:"none" }} disabled={imageFiles.length >= MAX_FILES} onChange={handleFileSelect} />
               </label>
               {previews.length > 0 && (
                 <div className="image-preview-grid">
