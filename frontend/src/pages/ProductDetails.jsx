@@ -280,17 +280,25 @@ const ImageGallery = ({ images, productName }) => {
 };
 
 /* ── Trust Badges ────────────────────────────────────────────────────────── */
-const TrustBadges = () => (
-  <div className="trust-badges">
-    {[
-      { icon: <ShieldCheck size={16} />, label: "Authentic Product" },
-      { icon: <Truck size={16} />,       label: "Free Delivery" },
-      { icon: <RotateCcw size={16} />,   label: "Easy Returns" },
-    ].map(({ icon, label }) => (
-      <div key={label} className="trust-badge">{icon}<span>{label}</span></div>
-    ))}
-  </div>
-);
+const BADGE_ICON_MAP = {
+  "Authentic Product": <ShieldCheck size={16} />,
+  "Free Delivery":     <Truck size={16} />,
+  "Easy Returns":      <RotateCcw size={16} />,
+};
+
+const TrustBadges = ({ badges }) => {
+  if (!badges?.length) return null;
+  return (
+    <div className="trust-badges">
+      {badges.map((label) => (
+        <div key={label} className="trust-badge">
+          {BADGE_ICON_MAP[label] ?? <ShieldCheck size={16} />}
+          <span>{label}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 /* ── Loading Skeleton ────────────────────────────────────────────────────── */
 const PageSkeleton = () => (
@@ -470,7 +478,7 @@ const ProductDetails = () => {
               </div>
             )}
 
-            <TrustBadges />
+            <TrustBadges badges={product.trustBadges} />
 
             <div className="pd-actions">
               <Link to="/book-test" className="pd-btn-primary">
